@@ -1,0 +1,3 @@
+D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows10.0.17763.0\ZipEase.UI.csproj.AssemblyReference.cache
+D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows10.0.17763.0\ZipEase.UI_Content.g.cs
+D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows10.0.17763.0\ZipEase.UI_MarkupCompile.cache

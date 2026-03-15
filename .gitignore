@@ -1,0 +1,18 @@
+# Build outputs
+.vs/
+ZipEase.Core/target/
+ZipEase.UI/bin/
+ZipEase.UI/obj/
+*.user
+
+# Development-only files (not for public release)
+.kiro/
+handoverbook.md
+legacy/
+tools/
+storage/
+docs/
+system_prompt.txt
+prompt_forge.py
+vibe.txt
+New_Project_Manifesto.md
