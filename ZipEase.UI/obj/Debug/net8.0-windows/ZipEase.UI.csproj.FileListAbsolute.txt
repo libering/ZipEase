@@ -36,3 +36,6 @@ D:\vibe coding\zipease\ZipEase.UI\bin\Debug\net8.0-windows\Wpf.Ui.Abstractions.d
 D:\vibe coding\zipease\ZipEase.UI\bin\Debug\net8.0-windows\7za.dll
 D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows\Core\PasswordDialog.baml
 D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows\Core\PasswordDialog.g.cs
+D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
+D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows\Core\CompressView.g.cs
+D:\vibe coding\zipease\ZipEase.UI\obj\Debug\net8.0-windows\Core\CompressView.baml

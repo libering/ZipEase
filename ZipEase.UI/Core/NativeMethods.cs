@@ -65,5 +65,92 @@ namespace ZipEase.UI.Core
             [MarshalAs(UnmanagedType.LPWStr)] string? password,
             IntPtr progressCallback
         );
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void CompressProgressCallback(int percentage, IntPtr currentFilePtr);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "zip_ease_compress")]
+        public static extern int Compress(
+            IntPtr[] inputPathPtrs,
+            int inputCount,
+            [MarshalAs(UnmanagedType.LPWStr)] string outputPath,
+            int level,
+            CompressProgressCallback? progressCallback
+        );
+
+        /// <summary>
+        /// Extracts a ZIP archive ignoring CRC errors (force/recovery mode).
+        /// Caller provides optional progress callback; pass IntPtr.Zero to omit.
+        /// Returns 0 on success, negative error code on failure.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "zip_ease_extract_force")]
+        public static extern int ExtractForce(
+            [MarshalAs(UnmanagedType.LPWStr)] string archivePath,
+            [MarshalAs(UnmanagedType.LPWStr)] string outputDir,
+            IntPtr progressCallback
+        );
+
+        /// <summary>
+        /// Extracts a single entry by zero-based index from a ZIP archive.
+        /// On success (returns 0), *outNamePtr is set to a Rust-allocated UTF-16 string
+        /// that MUST be freed with <see cref="FreeString"/>.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "zip_ease_extract_entry")]
+        public static extern int ExtractEntry(
+            [MarshalAs(UnmanagedType.LPWStr)] string archivePath,
+            uint entryIndex,
+            [MarshalAs(UnmanagedType.LPWStr)] string outputDir,
+            out IntPtr outNamePtr
+        );
+
+        /// <summary>
+        /// Frees a UTF-16 string allocated by Rust FFI (e.g. returned by ExtractEntry).
+        /// MUST be called in a finally block to prevent memory leaks.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "zip_ease_free_string")]
+        public static extern void FreeString(IntPtr ptr);
+
+        /// <summary>
+        /// Moves a file to the Windows Recycle Bin.
+        /// Returns 0 on success, -1 on panic, -2 on any other error.
+        /// No memory is allocated by Rust for this call — no free function needed.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "zip_ease_trash_file")]
+        public static extern int ZipEaseTrashFile(
+            [MarshalAs(UnmanagedType.LPWStr)] string path);
+
+        /// <summary>
+        /// Dispatches a success toast notification (fire-and-forget).
+        /// All errors are discarded silently in Rust — this call always returns.
+        /// No memory is allocated by Rust; no free function needed.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl,
+                   EntryPoint = "zip_ease_notify_success")]
+        public static extern void ZipEaseNotifySuccess(
+            [MarshalAs(UnmanagedType.LPWStr)] string archiveName,
+            [MarshalAs(UnmanagedType.LPWStr)] string outputFolder,
+            int fileCount);
+
+        /// <summary>
+        /// Dispatches a failure toast notification (fire-and-forget).
+        /// All errors are discarded silently in Rust — this call always returns.
+        /// No memory is allocated by Rust; no free function needed.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl,
+                   EntryPoint = "zip_ease_notify_failure")]
+        public static extern void ZipEaseNotifyFailure(
+            [MarshalAs(UnmanagedType.LPWStr)] string archiveName,
+            [MarshalAs(UnmanagedType.LPWStr)] string errorMsg);
+
+        /// <summary>
+        /// Returns a comma-separated list of process names that currently hold a lock on
+        /// the specified file path, or <see cref="System.IntPtr.Zero"/> if no lock holders
+        /// are found or the query fails.
+        /// The returned pointer MUST be freed with <see cref="FreeString"/> in a finally block.
+        /// </summary>
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl,
+                   EntryPoint = "zip_ease_who_locks")]
+        public static extern System.IntPtr ZipEaseWhoLocks(
+            [MarshalAs(UnmanagedType.LPWStr)] string path);
     }
 }

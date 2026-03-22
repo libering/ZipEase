@@ -25,6 +25,8 @@ namespace ZipEase.UI.Core
         [ObservableProperty] private bool _isStatusVisible;
         [ObservableProperty] private bool _isStatusError;
         [ObservableProperty] private string _currentPath = string.Empty;
+        [ObservableProperty] private bool _forceExtract;
+        [ObservableProperty] private bool _isTrashButtonEnabled;
 
         // Navigation state
         private readonly Stack<string> _navigationStack = new();
@@ -64,6 +66,8 @@ namespace ZipEase.UI.Core
             _pendingPassword = null;
             _passwordAttempts = 0;
             NotifyVisibilityChanged();
+            IsTrashButtonEnabled = false;
+            TrashSourceCommand.NotifyCanExecuteChanged();
         }
 
         public void TransitionToDragOver()
@@ -93,6 +97,8 @@ namespace ZipEase.UI.Core
             ExtractionProgress = 0;
             CurrentExtractionFile = string.Empty;
             NotifyVisibilityChanged();
+            IsTrashButtonEnabled = true;
+            TrashSourceCommand.NotifyCanExecuteChanged();
         }
 
         public void ShowError(string message)
@@ -118,6 +124,7 @@ namespace ZipEase.UI.Core
             OnPropertyChanged(nameof(IsDragOverActive));
             OnPropertyChanged(nameof(IsBackButtonVisible));
             OnPropertyChanged(nameof(FileCount));
+            OnPropertyChanged(nameof(IsTrashButtonEnabled));
         }
 
         // Navigation helpers
@@ -133,7 +140,7 @@ namespace ZipEase.UI.Core
             OnPropertyChanged(nameof(IsBackButtonVisible));
         }
 
-        internal static string GetImmediateParent(string entryName)
+        public static string GetImmediateParent(string entryName)
         {
             var trimmed = entryName.TrimEnd('/');
             var lastSlash = trimmed.LastIndexOf('/');
@@ -195,22 +202,38 @@ namespace ZipEase.UI.Core
 
             try
             {
-                int fileCount = await ExtractionManager.ExtractAsync(
-                    LoadedArchivePath,
-                    outputDir,
-                    _pendingPassword,
-                    (percentage, currentFile) =>
-                    {
-                        WpfApplication.Current.Dispatcher.BeginInvoke(() =>
+                int fileCount = ForceExtract
+                    ? await ExtractionManager.ExtractForceAsync(
+                        LoadedArchivePath,
+                        outputDir,
+                        (percentage, currentFile) =>
                         {
-                            ExtractionProgress = percentage;
-                            CurrentExtractionFile = currentFile;
+                            WpfApplication.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                ExtractionProgress = percentage;
+                                CurrentExtractionFile = currentFile;
+                            });
+                        })
+                    : await ExtractionManager.ExtractAsync(
+                        LoadedArchivePath,
+                        outputDir,
+                        _pendingPassword,
+                        (percentage, currentFile) =>
+                        {
+                            WpfApplication.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                ExtractionProgress = percentage;
+                                CurrentExtractionFile = currentFile;
+                            });
                         });
-                    });
 
                 _pendingPassword = null;
                 TransitionBackToPreviewing();
                 ShowSuccess($"Successfully extracted {fileCount} files to {outputDir}");
+                _ = ExtractionManager.NotifySuccessAsync(
+                        System.IO.Path.GetFileName(LoadedArchivePath),
+                        outputDir,
+                        fileCount);
             }
             catch (ExtractionException ex) when (ex.ErrorCode == unchecked((int)0x2004))
             {
@@ -221,11 +244,43 @@ namespace ZipEase.UI.Core
             {
                 TransitionBackToPreviewing();
                 ShowError($"Extraction failed: {ex.Message}");
+                _ = ExtractionManager.NotifyFailureAsync(
+                        System.IO.Path.GetFileName(LoadedArchivePath),
+                        ex.Message);
+
+                bool isAccessDenied = ex.Message.IndexOf("access", StringComparison.OrdinalIgnoreCase) >= 0
+                                   || ex.Message.IndexOf("denied", StringComparison.OrdinalIgnoreCase) >= 0
+                                   || ex.Message.IndexOf("sharing", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (isAccessDenied && LoadedArchivePath is not null)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        System.IntPtr ptr = System.IntPtr.Zero;
+                        try
+                        {
+                            ptr = await ExtractionManager.WhoLocksAsync(LoadedArchivePath);
+                            if (ptr != System.IntPtr.Zero)
+                            {
+                                string names = System.Runtime.InteropServices.Marshal.PtrToStringUni(ptr)!;
+                                WpfApplication.Current.Dispatcher.BeginInvoke(() =>
+                                    ShowError($"{names} is using this file. Close it and try again."));
+                            }
+                        }
+                        finally
+                        {
+                            NativeMethods.FreeString(ptr);
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {
                 TransitionBackToPreviewing();
                 ShowError($"Unexpected error: {ex.Message}");
+                _ = ExtractionManager.NotifyFailureAsync(
+                        System.IO.Path.GetFileName(LoadedArchivePath),
+                        ex.Message);
             }
         }
 
@@ -272,6 +327,89 @@ namespace ZipEase.UI.Core
             }
             LoadArchive(filePath);
         }
+
+        /// <summary>
+        /// Extracts a single entry to a temp folder and initiates a WPF drag-drop operation.
+        /// The temp file is placed in Path.GetTempPath() and cleaned up after the drag completes.
+        /// </summary>
+        [RelayCommand]
+        private async Task ExtractSingleEntry(ArchiveEntryViewModel? entry)
+        {
+            if (entry == null || entry.IsDirectory) return;
+            if (string.IsNullOrEmpty(LoadedArchivePath)) return;
+
+            // Find the zero-based index of this entry in the full flat list
+            int index = _allEntries.FindIndex(e => e.FileName == entry.FileName);
+            if (index < 0) return;
+
+            string tempDir = Path.Combine(Path.GetTempPath(), "ZipEase_drag_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                string extractedName = await ExtractionManager.ExtractEntryAsync(
+                    LoadedArchivePath,
+                    (uint)index,
+                    tempDir);
+
+                string extractedPath = Path.Combine(tempDir, extractedName);
+                if (!File.Exists(extractedPath)) return;
+
+                // Build a DataObject with the file path for shell drag-drop
+                var dataObject = new DataObject(DataFormats.FileDrop, new[] { extractedPath });
+
+                // DoDragDrop must run on the UI thread
+                WpfApplication.Current.Dispatcher.Invoke(() =>
+                {
+                    DragDrop.DoDragDrop(
+                        WpfApplication.Current.MainWindow,
+                        dataObject,
+                        DragDropEffects.Copy | DragDropEffects.Move);
+                });
+            }
+            catch (ExtractionException ex)
+            {
+                ShowError($"無法提取檔案: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"拖出失敗: {ex.Message}");
+            }
+            finally
+            {
+                // Best-effort cleanup of temp dir after drag completes
+                try { Directory.Delete(tempDir, recursive: true); } catch { }
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanTrashSource))]
+        private async Task TrashSource()
+        {
+            if (string.IsNullOrEmpty(LoadedArchivePath)) return;
+
+            // Optimistically disable to prevent double-click
+            IsTrashButtonEnabled = false;
+            TrashSourceCommand.NotifyCanExecuteChanged();
+
+            int result = await ExtractionManager.TrashFileAsync(LoadedArchivePath);
+
+            WpfApplication.Current.Dispatcher.BeginInvoke(() =>
+            {
+                if (result == 0)
+                {
+                    ShowSuccess("已移至資源回收桶 ♻️");
+                    // Button stays disabled — file is gone
+                }
+                else
+                {
+                    IsTrashButtonEnabled = true;
+                    TrashSourceCommand.NotifyCanExecuteChanged();
+                    ShowError("無法移至資源回收桶。請確認檔案未被其他程式使用後再試。");
+                }
+            });
+        }
+
+        private bool CanTrashSource() => IsTrashButtonEnabled;
 
         private void LoadArchive(string archivePath)
         {

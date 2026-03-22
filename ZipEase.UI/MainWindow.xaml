@@ -15,156 +15,196 @@
           Drop="OnDrop">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title Bar with window controls -->
+        <!-- Title Bar -->
         <ui:TitleBar Grid.Row="0"
                      Title="ZipEase"
                      ShowMinimize="True"
                      ShowMaximize="False"
                      ShowClose="True"/>
 
-        <!-- Idle State: Drop Zone -->
-        <Border Grid.Row="1"
-                Visibility="{Binding IsIdleVisible, Converter={StaticResource BoolToVisibility}}"
-                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                BorderThickness="2"
-                CornerRadius="12"
-                Margin="40"
-                Cursor="Hand"
-                MouseLeftButtonDown="OnDropZoneClick">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsDragOverActive}" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorPrimaryBrush}"/>
-                            <Setter Property="Background" Value="{DynamicResource SystemAccentColorSecondaryBrush}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ui:SymbolIcon Symbol="Archive24" FontSize="72"
+        <!-- Tab Strip -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,8,20,0">
+            <ui:Button x:Name="ExtractTabButton"
+                       Content="解壓縮"
+                       Icon="FolderArrowUp24"
+                       Click="OnExtractTabClick"
+                       Margin="0,0,8,0"/>
+            <ui:Button x:Name="CompressTabButton"
+                       Content="壓縮"
+                       Icon="Archive24"
+                       Click="OnCompressTabClick"/>
+        </StackPanel>
+
+        <!-- Extract Panel -->
+        <Grid x:Name="ExtractPanel"
+              Grid.Row="2"
+              AllowDrop="True">
+
+            <!-- Idle State: Drop Zone -->
+            <Border Visibility="{Binding IsIdleVisible, Converter={StaticResource BoolToVisibility}}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="2"
+                    CornerRadius="12"
+                    Margin="40"
+                    Cursor="Hand"
+                    MouseLeftButtonDown="OnDropZoneClick">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDragOverActive}" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorPrimaryBrush}"/>
+                                <Setter Property="Background" Value="{DynamicResource SystemAccentColorSecondaryBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="Archive24" FontSize="72"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="將壓縮檔拖放到此處，或點擊瀏覽"
+                               FontSize="20"
+                               FontWeight="SemiBold"
                                HorizontalAlignment="Center"
+                               Margin="0,24,0,0"/>
+                    <TextBlock Text="支援 .zip, .rar, .7z, .tar, .gz, .cab, .iso 格式"
+                               FontSize="13"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Preview State: Archive Contents -->
+            <Grid Visibility="{Binding IsPreviewVisible, Converter={StaticResource BoolToVisibility}}"
+                  Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Toolbar -->
+                <Grid Grid.Row="0" Margin="0,8,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ui:Button Grid.Column="0"
+                               Icon="ArrowLeft24"
+                               Command="{Binding NavigateBackCommand}"
+                               Visibility="{Binding IsBackButtonVisible, Converter={StaticResource BoolToVisibility}}"
+                               Margin="0,0,8,0"
+                               ToolTip="上一頁"/>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding LoadedArchivePath}"
+                               FontSize="13"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                <TextBlock Text="將壓縮檔拖放到此處，或點擊瀏覽"
-                           FontSize="20"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Margin="0,24,0,0"/>
-                <TextBlock Text="支援 .zip, .rar, .7z, .tar, .gz 格式"
-                           FontSize="13"
-                           HorizontalAlignment="Center"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           Margin="0,8,0,0"/>
-            </StackPanel>
-        </Border>
 
-        <!-- Preview State: Archive Contents -->
-        <Grid Grid.Row="1"
-              Visibility="{Binding IsPreviewVisible, Converter={StaticResource BoolToVisibility}}"
-              Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding FileCount, StringFormat='{}{0} 個檔案'}"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Margin="12,0,12,0"/>
 
-            <!-- Toolbar -->
-            <Grid Grid.Row="0" Margin="0,8,0,16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                    <CheckBox Grid.Column="3"
+                              Content="強行提取"
+                              IsChecked="{Binding ForceExtract}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,12,0"
+                              ToolTip="忽略 CRC 錯誤，強行提取損壞的壓縮檔"/>
 
-                <!-- Back button — visible only when inside a subfolder -->
-                <ui:Button Grid.Column="0"
-                           Icon="ArrowLeft24"
-                           Command="{Binding NavigateBackCommand}"
-                           Visibility="{Binding IsBackButtonVisible, Converter={StaticResource BoolToVisibility}}"
-                           Margin="0,0,8,0"
-                           ToolTip="上一頁"/>
+                    <ui:Button Grid.Column="4"
+                               Content="Extract All"
+                               Icon="FolderArrowUp24"
+                               Command="{Binding ExtractCommand}"
+                               IsEnabled="{Binding IsExtractButtonEnabled}"
+                               Appearance="Primary"
+                               Margin="0,0,8,0"/>
 
-                <TextBlock Grid.Column="1"
-                           Text="{Binding LoadedArchivePath}"
-                           FontSize="13"
-                           VerticalAlignment="Center"
-                           TextTrimming="CharacterEllipsis"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    <ui:Button Grid.Column="5"
+                               Content="Close"
+                               Icon="Dismiss24"
+                               Command="{Binding ResetCommand}"/>
+                </Grid>
 
-                <!-- File count -->
-                <TextBlock Grid.Column="2"
-                           Text="{Binding FileCount, StringFormat='{}{0} 個檔案'}"
-                           FontSize="12"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           Margin="12,0,12,0"/>
+                <!-- Archive Contents DataGrid -->
+                <DataGrid Grid.Row="1"
+                          x:Name="ArchiveDataGrid"
+                          ItemsSource="{Binding ArchiveEntries}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          SelectionMode="Extended"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          FontSize="13"
+                          RowHeight="32"
+                          BorderThickness="0"
+                          MouseDoubleClick="OnDataGridDoubleClick"
+                          PreviewMouseLeftButtonDown="OnDataGridPreviewMouseLeftButtonDown"
+                          PreviewMouseMove="OnDataGridPreviewMouseMove">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="File Name"
+                                            Binding="{Binding FileName}"
+                                            Width="*"/>
+                        <DataGridTextColumn Header="Type"
+                                            Binding="{Binding FileType}"
+                                            Width="80"/>
+                        <DataGridTextColumn Header="Size"
+                                            Binding="{Binding FormattedSize}"
+                                            Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                <ui:Button Grid.Column="3"
-                           Content="Extract All"
-                           Icon="FolderArrowUp24"
-                           Command="{Binding ExtractCommand}"
-                           IsEnabled="{Binding IsExtractButtonEnabled}"
-                           Appearance="Primary"
-                           Margin="0,0,8,0"/>
+                <!-- Progress Section -->
+                <StackPanel Grid.Row="2"
+                            Visibility="{Binding IsProgressVisible, Converter={StaticResource BoolToVisibility}}"
+                            Margin="0,16,0,0">
+                    <TextBlock Text="{Binding CurrentExtractionFile, StringFormat='Extracting: {0}'}"
+                               FontSize="12"
+                               Margin="0,0,0,8"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    <ProgressBar Value="{Binding ExtractionProgress}"
+                                 Height="6"
+                                 Minimum="0"
+                                 Maximum="100"/>
+                </StackPanel>
 
-                <ui:Button Grid.Column="4"
-                           Content="Close"
-                           Icon="Dismiss24"
-                           Command="{Binding ResetCommand}"/>
+                <!-- Status InfoBar — shows success/error after extraction.
+                     "Move to Recycle Bin" is the ONLY cleanup action (no permanent delete). -->
+                <ui:InfoBar Grid.Row="3"
+                            IsOpen="{Binding IsStatusVisible, Mode=TwoWay}"
+                            Message="{Binding StatusMessage}"
+                            IsClosable="True"
+                            Margin="0,12,0,0">
+                    <ui:InfoBar.ActionButton>
+                        <ui:Button Content="移至資源回收桶 ♻️"
+                                   Command="{Binding TrashSourceCommand}"
+                                   IsEnabled="{Binding IsTrashButtonEnabled}"
+                                   Visibility="{Binding IsTrashButtonEnabled, Converter={StaticResource BoolToVisibility}}"
+                                   Appearance="Secondary"/>
+                    </ui:InfoBar.ActionButton>
+                </ui:InfoBar>
             </Grid>
-
-            <!-- Archive Contents DataGrid -->
-            <DataGrid Grid.Row="1"
-                      x:Name="ArchiveDataGrid"
-                      ItemsSource="{Binding ArchiveEntries}"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      SelectionMode="Extended"
-                      GridLinesVisibility="Horizontal"
-                      HeadersVisibility="Column"
-                      FontSize="13"
-                      RowHeight="32"
-                      BorderThickness="0"
-                      MouseDoubleClick="OnDataGridDoubleClick">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="File Name"
-                                        Binding="{Binding FileName}"
-                                        Width="*"/>
-                    <DataGridTextColumn Header="Type"
-                                        Binding="{Binding FileType}"
-                                        Width="80"/>
-                    <DataGridTextColumn Header="Size"
-                                        Binding="{Binding FormattedSize}"
-                                        Width="100"/>
-                </DataGrid.Columns>
-            </DataGrid>
-
-            <!-- Progress Section -->
-            <StackPanel Grid.Row="2"
-                        Visibility="{Binding IsProgressVisible, Converter={StaticResource BoolToVisibility}}"
-                        Margin="0,16,0,0">
-                <TextBlock Text="{Binding CurrentExtractionFile, StringFormat='Extracting: {0}'}"
-                           FontSize="12"
-                           Margin="0,0,0,8"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                <ProgressBar Value="{Binding ExtractionProgress}"
-                             Height="6"
-                             Minimum="0"
-                             Maximum="100"/>
-            </StackPanel>
-
-            <!-- Status InfoBar -->
-            <ui:InfoBar Grid.Row="3"
-                        IsOpen="{Binding IsStatusVisible, Mode=TwoWay}"
-                        Message="{Binding StatusMessage}"
-                        IsClosable="True"
-                        Margin="0,12,0,0"/>
         </Grid>
+
+        <!-- Compress Panel -->
+        <core:CompressView x:Name="CompressPanel"
+                           Grid.Row="2"
+                           Visibility="Collapsed"/>
     </Grid>
 </ui:FluentWindow>

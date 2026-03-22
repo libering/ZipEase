@@ -18,10 +18,25 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel(new ArchivePreviewService());
+        CompressPanel.DataContext = new CompressViewModel();
+    }
+
+    // Tab switching
+    private void OnExtractTabClick(object sender, RoutedEventArgs e)
+    {
+        ExtractPanel.Visibility = Visibility.Visible;
+        CompressPanel.Visibility = Visibility.Collapsed;
+    }
+
+    private void OnCompressTabClick(object sender, RoutedEventArgs e)
+    {
+        ExtractPanel.Visibility = Visibility.Collapsed;
+        CompressPanel.Visibility = Visibility.Visible;
     }
 
     private void OnDragEnter(object sender, DragEventArgs e)
     {
+        if (CompressPanel.Visibility == Visibility.Visible) { e.Effects = DragDropEffects.None; return; }
         if (ViewModel.CurrentState != UIState.Idle) { e.Effects = DragDropEffects.None; return; }
 
         if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -52,6 +67,7 @@ public partial class MainWindow : FluentWindow
 
     private void OnDrop(object sender, DragEventArgs e)
     {
+        if (CompressPanel.Visibility == Visibility.Visible) return;
         if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
         if (files?.Length > 0)
@@ -67,5 +83,34 @@ public partial class MainWindow : FluentWindow
     {
         if (sender is WpfDataGrid grid && grid.SelectedItem is ArchiveEntryViewModel entry)
             ViewModel.NavigateIntoCommand.Execute(entry);
+    }
+
+    private System.Windows.Point _dragStartPoint;
+
+    private void OnDataGridPreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        _dragStartPoint = e.GetPosition(null);
+    }
+
+    private void OnDataGridPreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (e.LeftButton != System.Windows.Input.MouseButtonState.Pressed) return;
+
+        var pos = e.GetPosition(null);
+        var diff = pos - _dragStartPoint;
+
+        // Only start drag if mouse moved enough to distinguish from a click
+        if (Math.Abs(diff.X) < SystemParameters.MinimumHorizontalDragDistance &&
+            Math.Abs(diff.Y) < SystemParameters.MinimumVerticalDragDistance)
+            return;
+
+        if (ArchiveDataGrid.SelectedItem is not ZipEase.UI.Core.ArchiveEntryViewModel entry)
+            return;
+
+        if (entry.IsDirectory) return;
+
+        // Delegate actual extraction + drag to ViewModel command
+        if (ViewModel.ExtractSingleEntryCommand.CanExecute(entry))
+            ViewModel.ExtractSingleEntryCommand.Execute(entry);
     }
 }

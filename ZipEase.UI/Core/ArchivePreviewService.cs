@@ -10,7 +10,7 @@ namespace ZipEase.UI.Core
     public class ArchivePreviewService
     {
         private static readonly HashSet<string> SupportedExtensions =
-            new(StringComparer.OrdinalIgnoreCase) { ".zip", ".rar", ".7z", ".tar", ".gz" };
+            new(StringComparer.OrdinalIgnoreCase) { ".zip", ".rar", ".7z", ".tar", ".gz", ".cab", ".iso" };
 
         public bool IsSupportedArchive(string filePath)
         {
