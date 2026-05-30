@@ -1,8 +1,12 @@
+# Proptest regression files (machine-generated test artifacts)
+*.proptest-regressions
+
 # Build outputs
 .vs/
 ZipEase.Core/target/
 ZipEase.UI/bin/
 ZipEase.UI/obj/
+*_wpftmp*
 *.user
 
 # Development-only files (not for public release)

@@ -1,56 +1,61 @@
 # ZipEase
 
-> Windows 平台上的免費開源解壓縮工具，Unarchiver One 的開源替代品。
+Windows 解壓縮工具。開源。免費。
 
-ZipEase 是一款輕量的 Windows 桌面解壓縮應用程式，採用 Fluent Design 介面，支援拖放操作與 CJK 編碼自動偵測，讓解壓縮變得簡單直覺。
+拖放壓縮檔就能預覽內容。雙擊進入子資料夾。一鍵解壓。
 
+## 功能
 
-## 功能特色
+**拖放操作** — 壓縮檔拖進視窗，立刻看到內容。不用開選單，不用選路徑。
 
-- 拖放壓縮檔即可預覽內容
+**CJK 編碼偵測** — Shift-JIS、Big5、GBK、EUC-KR 自動識別。日本遊戲、台灣軟體、中國工具，檔名不再亂碼。
 
-- 支援目錄導航（雙擊進入子資料夾）
+**密碼支援** — ZIP 和 7z 密碼保護檔案直接開啟。密碼錯誤會提示，不是直接失敗。
 
-- 自動偵測 CJK 編碼（Shift-JIS、Big5、GBK、EUC-KR 等），告別亂碼
+**目錄導航** — 壓縮包裡的資料夾，雙擊進去。上一頁按鈕隨時回頭。
 
-- 密碼保護壓縮檔支援（ZIP、7z）
+**安全提取** — 解壓時鎖定來源檔案。其他程式無法刪除或修改。
 
-- 解壓進度顯示
+**Zip Bomb 防護** — 偵測壓縮炸彈。異常壓縮比、超大檔案、無限嵌套，直接警告。
 
-- Fluent Design 介面，支援 Dark mode 與 Mica backdrop
+**檔案佔用偵測** — 解壓失敗時告訴你是哪個程式佔用了檔案。不用猜。
 
-- 解壓過程中鎖定來源目錄，防止意外修改
+**右鍵選單** — 檔案總管右鍵直接解壓或壓縮。Windows 10 和 11 都支援。
+
+**Toast 通知** — 解壓完成跳出通知。不用盯著進度條。
+
+**多國語言** — 繁體中文、英文。設定頁切換，立刻生效。
+
+**主題系統** — Dark mode、Mica 背景、自訂主題。喜歡什麼樣式，自己決定。
 
 ## 支援格式
 
 | 格式 | 說明 |
-| - | - |
-| ZIP | 含 CJK 編碼自動偵測 |
-| TAR / TAR.GZ / TAR.BZ2 / TAR.XZ | 完整 TAR 系列 |
-| 7z | 含密碼支援 |
-| RAR | 透過內建 7za.dll |
+|------|------|
+| ZIP | CJK 編碼偵測、密碼支援、ZIP64 大檔案 |
+| 7z | 密碼支援 |
+| RAR | 內建 7za.dll |
+| TAR / TAR.GZ / TAR.BZ2 / TAR.XZ / TAR.ZST | 完整 TAR 系列 |
+| CAB | Windows Cabinet |
+| ISO | ISO 9660 + Joliet |
+| APK / JAR / IPA | ZIP-based 格式 |
+| 分割壓縮檔 | .001、.z01-.z09、.part1.rar |
 
+## 壓縮功能
+
+支援 ZIP、7z、TAR.GZ 壓縮。
+
+ZIP 支援密碼保護（AES-256）和 ZIP64（4GB 以上檔案）。
 
 ## 系統需求
 
 - Windows 10 / 11（x64）
-
 - .NET 8 Runtime
 
 ## 從原始碼建置
 
-**Rust 核心**
-
-```
-cd ZipEase.Core  
-cargo build --release
-```
-
-**UI**
-
-用 Visual Studio 2022 開啟 `ZipEase.slnx` 後建置即可。確保 `ZipEase.Core/target/release/zipease\_core.dll` 已存在。
+詳見 [`docs/BUILD_AND_TEST.md`](docs/BUILD_AND_TEST.md)。
 
 ## 授權
 
 MIT License
-
