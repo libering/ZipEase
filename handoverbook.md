@@ -1,6 +1,6 @@
 # 📘 ZipEase Project Handover Book
 
-> **Last Updated**: 2026-06-01
+> **Last Updated**: 2026-06-03
 > **Status**: Feature Complete / **PHASE: Polish & Stabilization**
 
 ## 1. 項目概覽 (Project Overview)
@@ -147,13 +147,14 @@
 
 ## 4. 待辦事項 (Next Steps)
 
-### 立即執行
-1. **GitHub Push** — 所有功能已完成，可以提交
+### ✅ 已完成
+1. **GitHub Push** — 2026-06-03 已推送至 `https://github.com/libering/ZipEase.git` (main branch)
 
 ### 後續功能 (可選)
 - 自動更新 — GitHub Releases API + Squirrel.Windows
-- 解壓縮歷史記錄 — 記住最近 20 個壓縮檔路徑，設定頁可清除
-- 批次解壓縮 — 一次拖入多個壓縮檔，全部解壓到同一目錄
+- 解壓縮歷史記錄 — 📝 Spec 已完成，實作待開始（見下方）
+- 壓縮格式擴展包 — 📝 Requirements 完成，Design/Tasks/實作未開始（見下方）
+- 視覺圖示強化 — 應用程式 `.ico`、DropZone 插圖、DataGrid 檔案類型圖示
 
 ### 插件扩展生态 (规划中) — 📝 Spec 已完成
 
@@ -305,10 +306,10 @@
 - `CommandLineParser` 處理命令列參數啟動對應模式
 - 8 項 PBT + 單元測試 + 整合測試
 
-### 其他自定義功能接口 — 規劃中
-- **自動更新** — GitHub Releases API 版本檢查 + `Squirrel.Windows`，背景靜默更新
-- **批次解壓縮** — ✅ 已完成（`BatchExtractionManager` + Rust `batch_extract`）
-- **解壓縮歷史記錄** — 📝 Spec 已完成
+### 其他自定義功能接口
+- **自動更新** — 📝 規劃中（GitHub Releases API 版本檢查 + `Squirrel.Windows`，背景靜默更新）；尚無程式碼
+- **批次解壓縮** — ✅ 已完成（`BatchExtractionManager.cs` + Rust `batch_extract` FFI）
+- **解壓縮歷史記錄** — 📝 Spec 完成（Requirements + Design + Tasks），實作未開始
 
 **Spec 位置**: `.kiro/specs/extraction-history/`
 
@@ -386,7 +387,7 @@
 - `ZipEase.Core/zipease-extract/src/repair/rar_repairer.rs`
 - `ZipEase.UI/Core/RepairService.cs`
 
-### 壓縮格式擴展包 (規劃中) — 📝 Spec 已完成
+### 壓縮格式擴展包 (規劃中) — 📝 Requirements 完成，部分功能已被現有模組涵蓋
 
 **Spec 位置**: `.kiro/specs/archive-format-extensions/`
 
@@ -399,14 +400,28 @@
 - 壓縮與解壓 UI 整合，自動偵測單檔格式限制並提供一鍵切換複合格式按鈕
 - 提供完整的 Round-Trip 屬性測試驗證
 
+**現有程式碼覆蓋分析（2026-06-03 審計）**：
+- ✅ `.tar.bz2`/`.tar.xz`/`.tar.zst` 解壓與壓縮 — 已在 `TarBackend` 中內建（`tar.rs` + `tar_gz.rs`）
+- ✅ LZ4/Zstd 單檔 — 已有外部 CLI 插件（`plugin-lz4/`, `plugin-zstd/`），但 Spec 要求內建到 `zipease-extract`
+- ❌ `FormatRegistry` 統一格式註冊機制 — 不存在，`smart.rs` 仍用硬編碼 `match`
+- ❌ BZIP2/XZ **單檔**解壓壓縮 — 不存在（`.bz2`/`.xz` 被路由到 `TarBackend`，非 TAR 歸檔會失敗）
+- ❌ `.tar.lz4` 複合格式 — 不存在（`zipease-extract` 無 `lz4_flex` 依賴）
+- ❌ Smart Router 重構 — 不存在（無法區分 `.bz2` 單檔 vs `.tar.bz2`）
+- ❌ 壓縮 UI 新格式下拉選單 — 未更新
+- ❌ C# `SupportedExtensions` — 缺少 `.lz4`, `.bzip2`, `.zstd`, `.tlz4`, `.tzst`
+- ❌ Round-Trip PBT 測試 — 不存在
+
 **狀態**：
 - [x] Requirements 文檔完成（12 個需求）
 - [ ] Design 文檔待開始
 - [ ] Tasks 文檔待開始
-- [ ] 實作待開始
+- [/] 實作部分完成（TAR 複合格式已內建，單檔格式與 FormatRegistry 未實作）
 
 **關鍵文件**：
 - `.kiro/specs/archive-format-extensions/requirements.md`
+- `ZipEase.Core/zipease-extract/src/extract/smart.rs` — 需重構的路由邏輯
+- `ZipEase.Core/zipease-extract/src/extract/tar.rs` — 已有 bz2/xz/zst TAR 支援
+- `ZipEase.Core/zipease-compress/src/compress/tar_gz.rs` — 已有 bz2/xz/zst TAR 壓縮
 
 ## 5. 關鍵技術決策與踩坑記錄
 
