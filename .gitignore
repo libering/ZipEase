@@ -4,10 +4,16 @@
 # Build outputs
 .vs/
 ZipEase.Core/target/
-ZipEase.UI/bin/
-ZipEase.UI/obj/
+**/bin/
+**/obj/
 *_wpftmp*
 *.user
+
+# Distribution / release artifacts
+dist/
+
+# Embedded repo (not a submodule)
+kiro-gateway/
 
 # Development-only files (not for public release)
 .kiro/

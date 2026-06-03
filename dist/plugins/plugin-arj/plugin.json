@@ -1,9 +1,0 @@
-{
-  "name": "ZipEase ARJ Plugin",
-  "version": "1.0.0",
-  "author": "ZipEase Team",
-  "description": "Supports ARJ format via arj command-line tool",
-  "extensions": [".arj"],
-  "executable": "plugin_arj.py",
-  "can_compress": false
-}

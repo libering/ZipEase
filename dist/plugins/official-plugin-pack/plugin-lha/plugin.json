@@ -1,9 +1,0 @@
-{
-  "name": "ZipEase LHA Plugin",
-  "version": "1.0.0",
-  "author": "ZipEase Team",
-  "description": "Supports LHA/LZH format via lha command-line tool",
-  "extensions": [".lha", ".lzh"],
-  "executable": "plugin_lha.py",
-  "can_compress": false
-}

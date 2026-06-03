@@ -1,9 +1,0 @@
-{
-  "name": "ZipEase Zstandard Plugin",
-  "version": "1.0.0",
-  "author": "ZipEase Team",
-  "description": "Supports Zstandard format via native Rust implementation",
-  "extensions": [".zst", ".zstd"],
-  "executable": "plugin-zstd.exe",
-  "can_compress": false
-}

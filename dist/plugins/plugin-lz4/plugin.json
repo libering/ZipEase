@@ -1,9 +1,0 @@
-{
-  "name": "ZipEase LZ4 Plugin",
-  "version": "1.0.0",
-  "author": "ZipEase Team",
-  "description": "Supports LZ4 format via native Rust implementation",
-  "extensions": [".lz4"],
-  "executable": "plugin-lz4.exe",
-  "can_compress": false
-}

@@ -1,9 +1,0 @@
-{
-  "name": "ZipEase DMG Plugin",
-  "version": "1.0.0",
-  "author": "ZipEase Team",
-  "description": "Supports DMG format via 7z command-line tool",
-  "extensions": [".dmg"],
-  "executable": "plugin_dmg.py",
-  "can_compress": false
-}
