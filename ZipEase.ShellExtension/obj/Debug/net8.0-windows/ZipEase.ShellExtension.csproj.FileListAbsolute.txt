@@ -1,0 +1,15 @@
+D:\vibe coding\zipease\ZipEase.ShellExtension\bin\Debug\net8.0-windows\ZipEase.ShellExtension.comhost.dll
+D:\vibe coding\zipease\ZipEase.ShellExtension\bin\Debug\net8.0-windows\ZipEase.ShellExtension.deps.json
+D:\vibe coding\zipease\ZipEase.ShellExtension\bin\Debug\net8.0-windows\ZipEase.ShellExtension.runtimeconfig.json
+D:\vibe coding\zipease\ZipEase.ShellExtension\bin\Debug\net8.0-windows\ZipEase.ShellExtension.dll
+D:\vibe coding\zipease\ZipEase.ShellExtension\bin\Debug\net8.0-windows\ZipEase.ShellExtension.pdb
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.GeneratedMSBuildEditorConfig.editorconfig
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.AssemblyInfoInputs.cache
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.AssemblyInfo.cs
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.csproj.CoreCompileInputs.cache
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.sourcelink.json
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.dll
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\refint\ZipEase.ShellExtension.dll
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.pdb
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ZipEase.ShellExtension.genruntimeconfig.cache
+D:\vibe coding\zipease\ZipEase.ShellExtension\obj\Debug\net8.0-windows\ref\ZipEase.ShellExtension.dll

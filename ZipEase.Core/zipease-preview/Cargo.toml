@@ -1,0 +1,18 @@
+[package]
+name = "zipease-preview"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zipease-shared = { path = "../zipease-shared" }
+zipease-extract = { path = "../zipease-extract" }
+image = "0.25"
+linked-hash-map = "0.5"
+log = { version = "0.4", features = ["max_level_debug", "release_max_level_debug"] }
+
+[dev-dependencies]
+tempfile = "3.10"
+proptest = "1.4"
+
+[lints]
+workspace = true

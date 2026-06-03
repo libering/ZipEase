@@ -52,6 +52,7 @@ impl ExtractionBackend for ZipBackend {
                 size: file.size() as i64,
             });
         }
+        crate::zlog(&format!("[zip] list_entries_info: {} entries for {:?}", entries.len(), archive_path));
         Ok(entries)
     }
 

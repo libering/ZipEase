@@ -101,7 +101,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.104/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -164,6 +164,14 @@
               "target": "Package",
               "version": "[2.16.6, )"
             },
+            "SkiaSharp.Views.WPF": {
+              "target": "Package",
+              "version": "[3.116.1, )"
+            },
+            "Svg.Skia": {
+              "target": "Package",
+              "version": "[2.0.0.4, )"
+            },
             "WPF-UI": {
               "target": "Package",
               "version": "[4.0.0, )"
@@ -188,7 +196,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.104/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -4,5 +4,14 @@ members = [
     "zipease-extract",
     "zipease-compress",
     "zipease-core",
+    "zipease-preview",
+    "plugin-7za-com",
+    "plugin-lz4",
+    "plugin-zstd",
 ]
 resolver = "2"
+
+
+[workspace.lints.clippy]
+# Allow older format!("{}", var) style — purely cosmetic, not worth mass-rewriting
+uninlined_format_args = "allow"

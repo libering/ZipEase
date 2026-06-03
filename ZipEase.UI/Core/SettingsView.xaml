@@ -1,0 +1,406 @@
+<UserControl x:Class="ZipEase.UI.Core.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:core="clr-namespace:ZipEase.UI.Core">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,24,32,24" MaxWidth="560">
+
+            <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Section_Extraction}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,24">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_ForceExtract_Title}"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_ForceExtract_Desc}"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding ForceExtract, Mode=TwoWay}"/>
+            </ui:CardControl>
+
+            <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Section_Cleanup}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_AutoTrash_Title}"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_AutoTrash_Desc}"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding AutoTrashAfterExtract, Mode=TwoWay}"/>
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,24">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_LockDetection_Title}"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_LockDetection_Desc}"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding LockDetection, Mode=TwoWay}"/>
+            </ui:CardControl>
+
+            <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Section_Appearance}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Toast_Title}"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Toast_Desc}"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding ToastNotifications, Mode=TwoWay}"/>
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Theme_Title}"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Theme_Desc}"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox SelectedIndex="{Binding Theme, Mode=TwoWay}" MinWidth="120">
+                    <ComboBoxItem Content="{Binding Source={x:Static core:L.Current}, Path=Settings_Theme_System}"/>
+                    <ComboBoxItem Content="{Binding Source={x:Static core:L.Current}, Path=Settings_Theme_Light}"/>
+                    <ComboBoxItem Content="{Binding Source={x:Static core:L.Current}, Path=Settings_Theme_Dark}"/>
+                </ComboBox>
+            </ui:CardControl>
+
+            <!-- ── Backdrop Material ────────────────────────────────────── -->
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="視窗背景效果"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="選擇視窗的透明模糊效果"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        <TextBlock Text="{Binding BackdropFallbackMessage}"
+                                   FontSize="12" Foreground="#E8A317"
+                                   Visibility="{Binding HasBackdropFallback, Converter={StaticResource BoolToVisibility}}"
+                                   TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox SelectedIndex="{Binding BackdropType, Mode=TwoWay}" MinWidth="120">
+                    <ComboBoxItem Content="無"/>
+                    <ComboBoxItem Content="Mica"/>
+                    <ComboBoxItem Content="Acrylic"/>
+                </ComboBox>
+            </ui:CardControl>
+
+            <!-- ── Custom Themes ────────────────────────────────────────── -->
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="自訂主題"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0">
+                            <Run Text="已載入"/>
+                            <Run Text="{Binding ThemeFileCount, Mode=OneWay}"/>
+                            <Run Text="個主題檔案"/>
+                        </TextBlock>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <Button Content="開啟主題資料夾"
+                        Command="{Binding OpenThemesFolderCommand}"/>
+            </ui:CardControl>
+
+            <!-- ── Custom Icons ─────────────────────────────────────────── -->
+            <ui:CardControl Margin="0,0,0,0">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="自訂檔案圖示"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="放置 SVG 檔案以替換檔案類型圖示"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <Button Content="開啟圖示資料夾"
+                        Command="{Binding OpenIconsFolderCommand}"/>
+            </ui:CardControl>
+
+            <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Section_Language}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,24,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,0">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Language_Title}"
+                                   FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Language_Desc}"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                          SelectedValuePath="Tag"
+                          SelectedValue="{Binding Language, Mode=TwoWay}"
+                          DisplayMemberPath="DisplayName"
+                          MinWidth="140"/>
+            </ui:CardControl>
+
+        
+            <!-- ── Security Section ─────────────────────────────────────── -->
+            <TextBlock Text="安全性"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Margin="0,24,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="解壓後總大小上限" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="超過此大小的壓縮包將被視為潛在威脅"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:NumberBox Value="{Binding ZipBombMaxTotalGb, Mode=TwoWay}"
+                                  Minimum="1" Maximum="1000" SpinButtonPlacementMode="Compact"
+                                  MinWidth="90"/>
+                    <TextBlock Text=" GB" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="單一檔案大小上限" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="壓縮包內單一檔案超過此大小時將被拒絕"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:NumberBox Value="{Binding ZipBombMaxSingleEntryGb, Mode=TwoWay}"
+                                  Minimum="1" Maximum="500" SpinButtonPlacementMode="Compact"
+                                  MinWidth="90"/>
+                    <TextBlock Text=" GB" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="壓縮比上限" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="解壓後大小與壓縮包大小的比值超過此值時將被拒絕"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:NumberBox Value="{Binding ZipBombMaxCompressionRatio, Mode=TwoWay}"
+                                  Minimum="10" Maximum="10000" SpinButtonPlacementMode="Compact"
+                                  MinWidth="90"/>
+                    <TextBlock Text=" ×" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="嵌套深度上限" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="壓縮包內含壓縮包的層數超過此值時將被拒絕"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:NumberBox Value="{Binding ZipBombMaxNestingDepth, Mode=TwoWay}"
+                                  Minimum="1" Maximum="10" SpinButtonPlacementMode="Compact"
+                                  MinWidth="90"/>
+                    <TextBlock Text=" 層" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <!-- Validation error message -->
+            <TextBlock Text="{Binding ZipBombValidationError}"
+                       Foreground="Red" FontSize="12" Margin="0,0,0,4"
+                       Visibility="{Binding HasZipBombValidationError, Converter={StaticResource BoolToVisibility}}"/>
+
+            <Button Content="重設為預設值"
+                    Command="{Binding ResetZipBombDefaultsCommand}"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,0,24"/>
+
+            <!-- ── Integration Section ──────────────────────────────────────── -->
+            <TextBlock Text="{Binding Source={x:Static core:L.Current}, Path=Settings_Integration_Title}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Margin="0,24,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding ShellExtensionStatusText}"
+                                   FontSize="14" FontWeight="Medium"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{Binding Source={x:Static core:L.Current}, Path=Settings_Shell_Register}"
+                            Command="{Binding RegisterShellAsyncCommand}"
+                            Visibility="{Binding IsShellExtensionEnabled, Converter={StaticResource InverseBoolToVisibility}}"
+                            Margin="0,0,8,0"/>
+                    <Button Content="{Binding Source={x:Static core:L.Current}, Path=Settings_Shell_Unregister}"
+                            Command="{Binding UnregisterShellAsyncCommand}"
+                            Visibility="{Binding IsShellExtensionEnabled, Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <!-- ── Plugins Section ──────────────────────────────────────────── -->
+            <TextBlock Text="插件"
+                       FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Margin="0,24,0,8"/>
+
+            <ui:CardControl Margin="0,0,0,12">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="插件管理" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="放置命令列插件於 %AppData%\ZipEase\plugins\ 以擴充支援格式。"
+                                   FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:Button Content="重新整理"
+                               Icon="ArrowClockwise24"
+                               Command="{Binding ReloadPluginsCommand}"
+                               Margin="0,0,8,0"/>
+                    <ui:Button Content="開啟插件資料夾"
+                               Icon="Folder24"
+                               Command="{Binding OpenPluginsFolderCommand}"/>
+                </StackPanel>
+            </ui:CardControl>
+
+            <TextBlock Text="已安裝的插件" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       Margin="0,12,0,8"
+                       Visibility="{Binding HasPlugins, Converter={StaticResource BoolToVisibility}}"/>
+
+            <!-- List of plugins -->
+            <ItemsControl ItemsSource="{Binding InstalledPlugins}"
+                          Visibility="{Binding HasPlugins, Converter={StaticResource BoolToVisibility}}"
+                          Margin="0,0,0,16">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,0,0,8" Padding="16,12"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="6"
+                                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Plugin Icon Badge -->
+                                <Border Grid.Column="0" Width="36" Height="36" CornerRadius="6" 
+                                        Background="{DynamicResource ControlAltFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <ui:SymbolIcon Symbol="Apps24" FontSize="18" 
+                                                   Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"/>
+                                </Border>
+                                
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- Title & Author -->
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+                                        <TextBlock Text="{Binding Manifest.Name}" FontSize="13" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Manifest.Version, StringFormat='v{0}'}" 
+                                                   FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   Margin="8,0,0,0" VerticalAlignment="Bottom"/>
+                                        <TextBlock Text=" · " FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   VerticalAlignment="Bottom"/>
+                                        <TextBlock Text="{Binding Manifest.Author, StringFormat='作者: {0}'}" 
+                                                   FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   VerticalAlignment="Bottom"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Description -->
+                                    <TextBlock Grid.Row="1" Text="{Binding Manifest.Description}" 
+                                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                    
+                                    <!-- Badges: Supported formats / Capabilities -->
+                                    <WrapPanel Grid.Row="2" Orientation="Horizontal">
+                                        <!-- Capabilities Badge -->
+                                        <Border CornerRadius="4" Padding="6,2" Background="{DynamicResource ControlAltFillColorSecondaryBrush}" Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="Settings24" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding DisplayCapabilities}" FontSize="11" 
+                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                        
+                                        <!-- Formats Badge -->
+                                        <Border CornerRadius="4" Padding="6,2" Background="{DynamicResource ControlAltFillColorSecondaryBrush}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="Folder24" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                <TextBlock Text="{Binding DisplayExtensions, StringFormat='格式: {0}'}" FontSize="11" 
+                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </WrapPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- No plugins installed card placeholder -->
+            <Border Padding="24" Margin="0,0,0,16"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="6"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    Visibility="{Binding HasNoPlugins, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,8">
+                    <ui:SymbolIcon Symbol="Info24" FontSize="36" 
+                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                   HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                    <TextBlock Text="未偵測到任何已安裝的插件" 
+                               FontSize="14" FontWeight="SemiBold"
+                               HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                    <TextBlock Text="請點擊上方按鈕開啟插件資料夾，並放入您的插件。" 
+                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

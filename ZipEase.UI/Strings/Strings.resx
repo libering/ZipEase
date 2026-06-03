@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+
+  <!-- Base (English fallback) — mirrors Strings.en.resx -->
+  <data name="Nav_Extract"><value>Extract</value></data>
+  <data name="Nav_Compress"><value>Compress</value></data>
+  <data name="Nav_Settings"><value>Settings</value></data>
+  <data name="DropZone_Title"><value>Drop archive here, or click to browse</value></data>
+  <data name="DropZone_Subtitle"><value>Supports all common archive formats</value></data>
+  <data name="Extract_Back_Tooltip"><value>Back</value></data>
+  <data name="Extract_FileCount"><value>{0} files</value></data>
+  <data name="Extract_ForceExtract"><value>Force Extract</value></data>
+  <data name="Extract_ForceExtract_Tooltip"><value>Ignore CRC errors and extract whatever is readable</value></data>
+  <data name="Extract_ExtractAll"><value>Extract All</value></data>
+  <data name="Extract_ExtractSelected"><value>Extract Selected</value></data>
+  <data name="Extract_Close"><value>Close</value></data>
+  <data name="Extract_SearchPlaceholder"><value>Search filenames, supports * and ? wildcards</value></data>
+  <data name="Extract_Extracting"><value>Extracting: {0}</value></data>
+  <data name="Extract_TrashButton"><value>Move to Recycle Bin ♻️</value></data>
+  <data name="Column_FileName"><value>File Name</value></data>
+  <data name="Column_Type"><value>Type</value></data>
+  <data name="Column_Size"><value>Size</value></data>
+  <data name="Compress_AddFiles"><value>Add Files</value></data>
+  <data name="Compress_AddFolder"><value>Add Folder</value></data>
+  <data name="Compress_Confirm"><value>Confirm</value></data>
+  <data name="Compress_Reset"><value>Reset</value></data>
+  <data name="Compress_OutputPlaceholder"><value>Output path...</value></data>
+  <data name="Compress_Browse"><value>Browse</value></data>
+  <data name="Compress_Level"><value>Level</value></data>
+  <data name="Compress_Password"><value>Password protect</value></data>
+  <data name="Compress_PasswordPlaceholder"><value>Enter password...</value></data>
+  <data name="Compress_Start"><value>Compress</value></data>
+  <data name="Compress_Compressing"><value>Compressing: {0}</value></data>
+  <data name="Settings_Section_Extraction"><value>Extraction</value></data>
+  <data name="Settings_ForceExtract_Title"><value>Force extract damaged files</value></data>
+  <data name="Settings_ForceExtract_Desc"><value>Skip error checks and extract whatever is readable from damaged archives.</value></data>
+  <data name="Settings_Section_Cleanup"><value>Cleanup &amp; File Locking</value></data>
+  <data name="Settings_AutoTrash_Title"><value>Auto-clean after extraction</value></data>
+  <data name="Settings_AutoTrash_Desc"><value>Move the source archive to the Recycle Bin after successful extraction.</value></data>
+  <data name="Settings_LockDetection_Title"><value>Detect file locks</value></data>
+  <data name="Settings_LockDetection_Desc"><value>When a file can't be moved or overwritten, show which app is locking it.</value></data>
+  <data name="Settings_Section_Appearance"><value>Notifications &amp; Appearance</value></data>
+  <data name="Settings_Toast_Title"><value>Completion notifications</value></data>
+  <data name="Settings_Toast_Desc"><value>Show a Windows toast notification when extraction completes.</value></data>
+  <data name="Settings_Theme_Title"><value>Theme</value></data>
+  <data name="Settings_Theme_Desc"><value>Choose light, dark, or follow the Windows system setting.</value></data>
+  <data name="Settings_Theme_System"><value>Follow system</value></data>
+  <data name="Settings_Theme_Light"><value>Light</value></data>
+  <data name="Settings_Theme_Dark"><value>Dark</value></data>
+  <data name="Settings_Section_Language"><value>Language</value></data>
+  <data name="Settings_Language_Title"><value>Interface language</value></data>
+  <data name="Settings_Language_Desc"><value>Choose the display language.</value></data>
+  <data name="PasswordDialog_Title"><value>Password Required</value></data>
+  <data name="PasswordDialog_Prompt"><value>This archive is password protected. Please enter the password:</value></data>
+  <data name="PasswordDialog_Confirm"><value>OK</value></data>
+  <data name="PasswordDialog_Cancel"><value>Cancel</value></data>
+  <data name="PasswordDialog_WrongPassword"><value>Wrong password, please try again</value></data>
+  <data name="Status_ExtractSuccess"><value>Successfully extracted {0} files to {1}</value></data>
+  <data name="Status_ExtractSelectedSuccess"><value>Extracted {0} files to {1}</value></data>
+  <data name="Status_ExtractFailed"><value>Extraction failed: {0}</value></data>
+  <data name="Status_UnexpectedError"><value>Unexpected error: {0}</value></data>
+  <data name="Status_WrongPassword"><value>Wrong password, extraction cancelled</value></data>
+  <data name="Status_Trashed"><value>Moved to Recycle Bin ♻️</value></data>
+  <data name="Status_TrashFailed"><value>Could not move to Recycle Bin. Make sure no other app is using the file.</value></data>
+  <data name="Status_AutoTrashFailed"><value>Could not auto-remove source archive. Please delete it manually.</value></data>
+  <data name="Status_UnsupportedFormat"><value>Unsupported format. Supported: .zip, .rar, .7z, .tar, .gz</value></data>
+  <data name="Status_NoSupportedArchives"><value>No supported archives detected. Supported: .zip, .7z, .rar, .tar, .gz, .bz2, .xz, .zst, .cab, .iso</value></data>
+  <data name="Status_LoadFailed"><value>Failed to open archive: {0}</value></data>
+  <data name="Status_FileLocked"><value>{0} is using this file. Close it and try again.</value></data>
+  <data name="Status_CompressSuccess"><value>Compressed: {0}</value></data>
+  <data name="Status_CompressFailed"><value>Compression failed: {0}</value></data>
+  <data name="Dialog_SelectArchive"><value>Select Archive File</value></data>
+  <data name="Dialog_SelectOutput"><value>Select Output Folder</value></data>
+  <data name="Dialog_SelectFiles"><value>Select Files to Compress</value></data>
+  <data name="Dialog_SelectCompressOutput"><value>Select Output Location</value></data>
+
+  <!-- Shell Extension Integration -->
+  <data name="Settings_Integration_Title"><value>Integration</value></data>
+  <data name="Settings_Shell_Enabled"><value>✅ Context menu enabled</value></data>
+  <data name="Settings_Shell_Disabled"><value>❌ Context menu not enabled — click the button below to enable</value></data>
+  <data name="Settings_Shell_Failed"><value>⚠️ Context menu registration failed — try restarting ZipEase as administrator</value></data>
+  <data name="Settings_Shell_Register"><value>Register</value></data>
+  <data name="Settings_Shell_Unregister"><value>Unregister</value></data>
+</root>

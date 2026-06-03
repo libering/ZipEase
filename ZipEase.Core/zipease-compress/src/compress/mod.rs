@@ -12,11 +12,13 @@ pub struct CompressOptions {
     pub level: u8,
     /// If true, store paths relative to a common base directory.
     pub store_relative_paths: bool,
+    /// Optional password for AES-256 encryption (ZIP only).
+    pub password: Option<String>,
 }
 
 impl Default for CompressOptions {
     fn default() -> Self {
-        Self { level: 6, store_relative_paths: true }
+        Self { level: 6, store_relative_paths: true, password: None }
     }
 }
 

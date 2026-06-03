@@ -30,11 +30,6 @@ fn le32(buf: &[u8], off: usize) -> u32 {
     u32::from_le_bytes(buf[off..off + 4].try_into().unwrap())
 }
 
-#[allow(dead_code)]
-fn le16(buf: &[u8], off: usize) -> u16 {
-    u16::from_le_bytes(buf[off..off + 2].try_into().unwrap())
-}
-
 // ── Volume Descriptor parsing ────────────────────────────────────────────────
 
 struct VolumeInfo {

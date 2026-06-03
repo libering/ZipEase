@@ -74,7 +74,7 @@ namespace ZipEase.UI.Core
             IntPtr ptr = NativeMethods.GetLastError();
             if (ptr == IntPtr.Zero) return "Unknown error";
 
-            string? message = Marshal.PtrToStringUni(ptr);
+            string? message = Marshal.PtrToStringUTF8(ptr);
             NativeMethods.FreeErrorString(ptr);
             return message ?? "Unknown error";
         }

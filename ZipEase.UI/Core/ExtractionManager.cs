@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using ZipEase.UI.Core.Plugin;
 
 namespace ZipEase.UI.Core
 {
@@ -25,15 +26,46 @@ namespace ZipEase.UI.Core
 
         /// <summary>
         /// Extracts an archive asynchronously with optional password and progress reporting.
+        /// Supports registered CLI plugins with fallback capabilities.
         /// </summary>
-        public static Task<int> ExtractAsync(
+        public static async Task<int> ExtractAsync(
             string archivePath,
             string outputDir,
             string? password = null,
             ProgressCallback? progressCallback = null)
         {
-            return Task.Run(() => Extract(archivePath, outputDir, password, progressCallback));
+            if (string.IsNullOrEmpty(archivePath))
+                throw new ArgumentException("Archive path cannot be null or empty", nameof(archivePath));
+
+            var ext = Path.GetExtension(archivePath);
+            if (!ArchivePreviewService.IsNativeExtension(ext))
+            {
+                var plugin = PluginRegistry.FindForExtension(ext);
+                if (plugin != null)
+                {
+                    try
+                    {
+                        return await PluginBackend.ExtractAsync(plugin, archivePath, outputDir, password, progressCallback);
+                    }
+                    catch (Exception ex) when (ex is PluginException || ex.InnerException is PluginException)
+                    {
+                        var fallback = PluginRegistry.FindFallbackPlugin(ext);
+                        if (fallback != null)
+                        {
+                            try
+                            {
+                                return await PluginBackend.ExtractAsync(fallback, archivePath, outputDir, password, progressCallback);
+                            }
+                            catch { /* ignore and throw primary */ }
+                        }
+                        throw;
+                    }
+                }
+            }
+
+            return await Task.Run(() => Extract(archivePath, outputDir, password, progressCallback));
         }
+
 
         /// <summary>
         /// Extracts an archive synchronously with optional password and progress reporting.
@@ -111,7 +143,9 @@ namespace ZipEase.UI.Core
             IntPtr ptr = NativeMethods.GetLastError();
             if (ptr == IntPtr.Zero) return "Unknown error";
 
-            string? message = Marshal.PtrToStringUni(ptr);
+            // Rust returns UTF-8 C string (*const c_char), not UTF-16
+            // Use PtrToStringUTF8 (.NET 6+) for correct decoding
+            string? message = Marshal.PtrToStringUTF8(ptr);
             NativeMethods.FreeErrorString(ptr);
             return message ?? "Unknown error";
         }
@@ -233,7 +267,7 @@ namespace ZipEase.UI.Core
                 IntPtr outNamePtr = IntPtr.Zero;
                 try
                 {
-                    int result = NativeMethods.ExtractEntry(archivePath, entryIndex, outputDir, out outNamePtr);
+                    int result = NativeMethods.ExtractEntryAny(archivePath, entryIndex, outputDir, out outNamePtr);
                     if (result < 0)
                     {
                         string errorMessage = GetLastErrorMessage();
@@ -242,6 +276,49 @@ namespace ZipEase.UI.Core
                     return outNamePtr != IntPtr.Zero
                         ? Marshal.PtrToStringUni(outNamePtr) ?? string.Empty
                         : string.Empty;
+                }
+                finally
+                {
+                    // Always free Rust-allocated string, even on exception
+                    if (outNamePtr != IntPtr.Zero)
+                        NativeMethods.FreeString(outNamePtr);
+                }
+            });
+        }
+        /// <summary>
+        /// Extracts a single entry by full path name from any archive format (7z, RAR, TAR, etc.).
+        /// Uses name-based matching to avoid index offset issues with non-ZIP formats.
+        /// Returns the extracted filename (no path) on success.
+        /// Memory contract: Rust allocates the name string; freed via FreeString in finally block.
+        /// </summary>
+        public static Task<string> ExtractEntryByNameAsync(
+            string archivePath,
+            string entryName,
+            string outputDir)
+        {
+            return Task.Run(() =>
+            {
+                if (string.IsNullOrEmpty(archivePath))
+                    throw new ArgumentException("Archive path cannot be null or empty", nameof(archivePath));
+                if (string.IsNullOrEmpty(entryName))
+                    throw new ArgumentException("Entry name cannot be null or empty", nameof(entryName));
+                if (string.IsNullOrEmpty(outputDir))
+                    throw new ArgumentException("Output directory cannot be null or empty", nameof(outputDir));
+                if (!File.Exists(archivePath))
+                    throw new FileNotFoundException("Archive file not found", archivePath);
+
+                IntPtr outNamePtr = IntPtr.Zero;
+                try
+                {
+                    int result = NativeMethods.ExtractEntryByName(archivePath, entryName, outputDir, out outNamePtr);
+                    if (result < 0)
+                    {
+                        string errorMessage = GetLastErrorMessage();
+                        throw new ExtractionException(errorMessage, result);
+                    }
+                    return outNamePtr != IntPtr.Zero
+                        ? Marshal.PtrToStringUni(outNamePtr) ?? System.IO.Path.GetFileName(entryName)
+                        : System.IO.Path.GetFileName(entryName);
                 }
                 finally
                 {

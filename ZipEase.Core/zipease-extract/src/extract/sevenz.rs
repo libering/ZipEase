@@ -29,7 +29,7 @@ impl ExtractionBackend for SevenZBackend {
             .map(|e| super::ArchiveEntryInfo {
                 name: e.name().to_string(),
                 is_directory: e.is_directory(),
-                size: -1,
+                size: if e.is_directory() { -1 } else { e.size as i64 },
             })
             .collect();
         Ok(entries)
@@ -104,7 +104,7 @@ impl SevenZBackend {
             .map(|e| ArchiveEntryInfo {
                 name: e.name().to_string(),
                 is_directory: e.is_directory(),
-                size: -1,
+                size: if e.is_directory() { -1 } else { e.size as i64 },
             })
             .collect();
         Ok(entries)

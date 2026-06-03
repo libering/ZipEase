@@ -14,6 +14,7 @@ type CompressProgressCallback = extern "C" fn(i32, *const u16);
 /// - `input_count`      : number of input paths
 /// - `output_path_ptr`  : UTF-16 null-terminated path for the output archive (C#-owned)
 /// - `level`            : compression level 0–9
+/// - `password_ptr`     : optional UTF-16 null-terminated password (may be null = no encryption)
 /// - `progress_callback`: optional progress callback (may be null)
 ///
 /// # Returns
@@ -25,20 +26,25 @@ pub extern "C" fn zip_ease_compress(
     input_count: i32,
     output_path_ptr: *const u16,
     level: i32,
+    password_ptr: *const u16,
     progress_callback: Option<CompressProgressCallback>,
 ) -> i32 {
     std::panic::catch_unwind(|| {
-        // Guard: null pointer or invalid count
         if input_paths_ptr.is_null() || output_path_ptr.is_null() || input_count < 1 {
             return -1;
         }
 
         let level = level.clamp(0, 9) as u8;
-
-        // Parse output path
         let output_path = unsafe { parse_wide_string(output_path_ptr) };
 
-        // Parse input paths — Rust reads but never frees these C#-owned pointers
+        let password = if password_ptr.is_null() {
+            None
+        } else {
+            let pwd_path = unsafe { parse_wide_string(password_ptr) };
+            let s = pwd_path.to_string_lossy().into_owned();
+            if s.is_empty() { None } else { Some(s) }
+        };
+
         let input_paths_owned: Vec<PathBuf> = unsafe {
             let slice = std::slice::from_raw_parts(input_paths_ptr, input_count as usize);
             slice.iter().map(|&ptr| parse_wide_string(ptr)).collect()
@@ -52,6 +58,7 @@ pub extern "C" fn zip_ease_compress(
         let options = CompressOptions {
             level,
             store_relative_paths: true,
+            password,
         };
 
         let progress_fn = |current: usize, total: usize, file_name: &str| {

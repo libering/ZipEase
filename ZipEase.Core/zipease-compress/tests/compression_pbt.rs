@@ -39,7 +39,7 @@ proptest! {
         let call_count = Arc::new(Mutex::new(0usize));
         let call_count_clone = Arc::clone(&call_count);
 
-        let options = CompressOptions { level, store_relative_paths: true };
+        let options = CompressOptions { level, store_relative_paths: true, password: None };
         let result = compress_with_progress(
             &input_refs,
             &output,
@@ -65,7 +65,7 @@ proptest! {
         let out_dir = TempDir::new().unwrap();
         let output = out_dir.path().join("out.zip");
 
-        let options = CompressOptions { level, store_relative_paths: true };
+        let options = CompressOptions { level, store_relative_paths: true, password: None };
         let result = compress_with_progress(&input_refs, &output, &options, |_, _, _| {});
 
         prop_assume!(result.is_ok());
@@ -85,7 +85,7 @@ fn test_zip_round_trip() {
     let out_dir = TempDir::new().unwrap();
     let output = out_dir.path().join("out.zip");
 
-    let options = CompressOptions { level: 6, store_relative_paths: true };
+    let options = CompressOptions { level: 6, store_relative_paths: true, password: None };
     compress_with_progress(&input_refs, &output, &options, |_, _, _| {}).unwrap();
 
     let extract_dir = TempDir::new().unwrap();

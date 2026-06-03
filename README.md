@@ -34,7 +34,7 @@ Windows 解壓縮工具。開源。免費。
 |------|------|
 | ZIP | CJK 編碼偵測、密碼支援、ZIP64 大檔案 |
 | 7z | 密碼支援 |
-| RAR | 內建 7za.dll |
+| RAR | 基於 unrar 靜態連結庫（不需外部 DLL） |
 | TAR / TAR.GZ / TAR.BZ2 / TAR.XZ / TAR.ZST | 完整 TAR 系列 |
 | CAB | Windows Cabinet |
 | ISO | ISO 9660 + Joliet |

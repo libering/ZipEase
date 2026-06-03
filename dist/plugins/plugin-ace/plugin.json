@@ -1,0 +1,9 @@
+{
+  "name": "ZipEase ACE Plugin",
+  "version": "1.0.0",
+  "author": "ZipEase Team",
+  "description": "Supports ACE format via unace command-line tool",
+  "extensions": [".ace"],
+  "executable": "plugin_ace.py",
+  "can_compress": false
+}

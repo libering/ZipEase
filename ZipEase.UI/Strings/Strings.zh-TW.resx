@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+
+  <!-- Sidebar -->
+  <data name="Nav_Extract"><value>解壓縮</value></data>
+  <data name="Nav_Compress"><value>壓縮</value></data>
+  <data name="Nav_Settings"><value>設定</value></data>
+
+  <!-- Drop Zone -->
+  <data name="DropZone_Title"><value>將壓縮檔拖放到此處，或點擊瀏覽</value></data>
+  <data name="DropZone_Subtitle"><value>支援所有常見壓縮格式</value></data>
+
+  <!-- Extract Toolbar -->
+  <data name="Extract_Back_Tooltip"><value>上一頁</value></data>
+  <data name="Extract_FileCount"><value>{0} 個檔案</value></data>
+  <data name="Extract_ForceExtract"><value>強制提取</value></data>
+  <data name="Extract_ForceExtract_Tooltip"><value>忽略 CRC 錯誤，強行提取損壞的壓縮檔</value></data>
+  <data name="Extract_ExtractAll"><value>全部解壓縮</value></data>
+  <data name="Extract_ExtractSelected"><value>解壓縮選取</value></data>
+  <data name="Extract_Close"><value>關閉</value></data>
+  <data name="Extract_SearchPlaceholder"><value>搜尋檔案名稱，支援 * 和 ? 萬用字元</value></data>
+  <data name="Extract_Extracting"><value>解壓縮中：{0}</value></data>
+  <data name="Extract_TrashButton"><value>移至資源回收桶 ♻️</value></data>
+
+  <!-- DataGrid Headers -->
+  <data name="Column_FileName"><value>檔案名稱</value></data>
+  <data name="Column_Type"><value>類型</value></data>
+  <data name="Column_Size"><value>大小</value></data>
+
+  <!-- Compress View -->
+  <data name="Compress_AddFiles"><value>新增檔案</value></data>
+  <data name="Compress_AddFolder"><value>新增資料夾</value></data>
+  <data name="Compress_Confirm"><value>確認壓縮</value></data>
+  <data name="Compress_Reset"><value>重設</value></data>
+  <data name="Compress_OutputPlaceholder"><value>輸出路徑...</value></data>
+  <data name="Compress_Browse"><value>瀏覽</value></data>
+  <data name="Compress_Level"><value>等級</value></data>
+  <data name="Compress_Password"><value>設定密碼保護</value></data>
+  <data name="Compress_PasswordPlaceholder"><value>輸入密碼...</value></data>
+  <data name="Compress_Start"><value>開始壓縮</value></data>
+  <data name="Compress_Compressing"><value>壓縮中：{0}</value></data>
+
+  <!-- Settings View -->
+  <data name="Settings_Section_Extraction"><value>解壓縮行為</value></data>
+  <data name="Settings_ForceExtract_Title"><value>損壞檔案強制提取</value></data>
+  <data name="Settings_ForceExtract_Desc"><value>遇到損壞檔案時，略過錯誤檢查，盡可能提取出可用的部分。</value></data>
+  <data name="Settings_Section_Cleanup"><value>清理與佔用排除</value></data>
+  <data name="Settings_AutoTrash_Title"><value>解壓後自動清理原始壓縮包</value></data>
+  <data name="Settings_AutoTrash_Desc"><value>解壓縮成功後，自動將原始壓縮包移至「資源回收桶」。</value></data>
+  <data name="Settings_LockDetection_Title"><value>偵測檔案佔用程式</value></data>
+  <data name="Settings_LockDetection_Desc"><value>當檔案無法移動或覆寫時，自動偵測並顯示是哪個程式鎖定了檔案。</value></data>
+  <data name="Settings_Section_Appearance"><value>通知與外觀</value></data>
+  <data name="Settings_Toast_Title"><value>任務完成通知</value></data>
+  <data name="Settings_Toast_Desc"><value>解壓縮完成時，在 Windows 右下角顯示彈窗提示。</value></data>
+  <data name="Settings_Theme_Title"><value>介面主題</value></data>
+  <data name="Settings_Theme_Desc"><value>選擇淺色、深色，或跟隨 Windows 系統設定。</value></data>
+  <data name="Settings_Theme_System"><value>跟隨系統</value></data>
+  <data name="Settings_Theme_Light"><value>淺色模式</value></data>
+  <data name="Settings_Theme_Dark"><value>深色模式</value></data>
+  <data name="Settings_Section_Language"><value>語言</value></data>
+  <data name="Settings_Language_Title"><value>介面語言</value></data>
+  <data name="Settings_Language_Desc"><value>選擇應用程式的顯示語言。</value></data>
+
+  <!-- Password Dialog -->
+  <data name="PasswordDialog_Title"><value>需要密碼</value></data>
+  <data name="PasswordDialog_Prompt"><value>此壓縮檔受密碼保護，請輸入密碼：</value></data>
+  <data name="PasswordDialog_Confirm"><value>確認</value></data>
+  <data name="PasswordDialog_Cancel"><value>取消</value></data>
+  <data name="PasswordDialog_WrongPassword"><value>密碼錯誤，請重試</value></data>
+
+  <!-- Status Messages (ViewModel) -->
+  <data name="Status_ExtractSuccess"><value>成功解壓縮 {0} 個檔案至 {1}</value></data>
+  <data name="Status_ExtractSelectedSuccess"><value>已解壓縮 {0} 個檔案至 {1}</value></data>
+  <data name="Status_ExtractFailed"><value>解壓縮失敗：{0}</value></data>
+  <data name="Status_UnexpectedError"><value>未預期的錯誤：{0}</value></data>
+  <data name="Status_WrongPassword"><value>密碼錯誤，已取消開啟壓縮檔</value></data>
+  <data name="Status_Trashed"><value>已移至資源回收桶 ♻️</value></data>
+  <data name="Status_TrashFailed"><value>無法移至資源回收桶。請確認檔案未被其他程式使用後再試。</value></data>
+  <data name="Status_AutoTrashFailed"><value>無法自動移除原始壓縮包，請手動刪除。</value></data>
+  <data name="Status_UnsupportedFormat"><value>不支援的格式。支援：.zip, .rar, .7z, .tar, .gz</value></data>
+  <data name="Status_NoSupportedArchives"><value>未偵測到支援的壓縮檔。支援格式：.zip, .7z, .rar, .tar, .gz, .bz2, .xz, .zst, .cab, .iso</value></data>
+  <data name="Status_LoadFailed"><value>無法開啟壓縮檔：{0}</value></data>
+  <data name="Status_FileLocked"><value>{0} 正在使用此檔案，請關閉後再試。</value></data>
+  <data name="Status_CompressSuccess"><value>壓縮完成：{0}</value></data>
+  <data name="Status_CompressFailed"><value>壓縮失敗：{0}</value></data>
+
+  <!-- Dialogs -->
+  <data name="Dialog_SelectArchive"><value>選擇壓縮檔</value></data>
+  <data name="Dialog_SelectOutput"><value>選擇輸出資料夾</value></data>
+  <data name="Dialog_SelectFiles"><value>選擇要壓縮的檔案</value></data>
+  <data name="Dialog_SelectCompressOutput"><value>選擇輸出位置</value></data>
+
+  <!-- Shell Extension Integration -->
+  <data name="Settings_Integration_Title"><value>整合</value></data>
+  <data name="Settings_Shell_Enabled"><value>✅ 右鍵選單已啟用</value></data>
+  <data name="Settings_Shell_Disabled"><value>❌ 右鍵選單未啟用 — 點擊下方按鈕啟用</value></data>
+  <data name="Settings_Shell_Failed"><value>⚠️ 右鍵選單啟用失敗 — 請以系統管理員身分重新啟動 ZipEase 後再試</value></data>
+  <data name="Settings_Shell_Register"><value>重新註冊</value></data>
+  <data name="Settings_Shell_Unregister"><value>停用</value></data>
+</root>

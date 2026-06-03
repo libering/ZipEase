@@ -19,7 +19,7 @@ pub fn trash_file(path_ptr: *const u16) -> Result<(), String> {
         String::from_utf16_lossy(slice)
     };
 
-    trash::delete(&path).map_err(|e| map_trash_error(e))
+    trash::delete(&path).map_err(map_trash_error)
 }
 
 fn map_trash_error(e: trash::Error) -> String {

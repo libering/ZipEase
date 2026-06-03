@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package IgnorableNamespaces="uap uap10 desktop4 desktop5 com rescap"
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
+
+  <Identity Name="ZipEase.App"
+            Publisher="CN=ZipEase"
+            Version="1.0.0.0"
+            ProcessorArchitecture="neutral" />
+
+  <Properties>
+    <DisplayName>ZipEase</DisplayName>
+    <PublisherDisplayName>ZipEase</PublisherDisplayName>
+    <Logo>Assets\Square44x44Logo.png</Logo>
+    <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
+  </Properties>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="zh-Hant" />
+  </Resources>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop"
+                        MinVersion="10.0.22000.0"
+                        MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+
+  <Applications>
+    <Application Id="ZipEase"
+                 Executable="ZipEase.exe"
+                 uap10:TrustLevel="mediumIL"
+                 uap10:RuntimeBehavior="win32App">
+      <uap:VisualElements AppListEntry="none"
+                          DisplayName="ZipEase"
+                          Description="ZipEase Archive Manager"
+                          BackgroundColor="transparent"
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png" />
+
+      <Extensions>
+        <!-- COM Server declarations for Shell Extension -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:SurrogateServer DisplayName="ZipEase Shell Extension">
+              <com:Class Id="B5A3D1E7-8F2C-4A6B-9D0E-1C3F5A7B9D2E"
+                         Path="ZipEase.ShellExtension.dll"
+                         ThreadingModel="STA" />
+              <com:Class Id="C6B4E2F8-9A3D-5B7C-AE1F-2D4G6B8C0E3F"
+                         Path="ZipEase.ShellExtension.dll"
+                         ThreadingModel="STA" />
+            </com:SurrogateServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <!-- File Explorer Context Menu declarations -->
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+            <desktop5:ItemType Type="*">
+              <desktop5:Verb Id="ZipEaseExtract"
+                             Clsid="B5A3D1E7-8F2C-4A6B-9D0E-1C3F5A7B9D2E" />
+              <desktop5:Verb Id="ZipEaseCompress"
+                             Clsid="C6B4E2F8-9A3D-5B7C-AE1F-2D4G6B8C0E3F" />
+            </desktop5:ItemType>
+            <desktop5:ItemType Type="Directory">
+              <desktop5:Verb Id="ZipEaseCompress"
+                             Clsid="C6B4E2F8-9A3D-5B7C-AE1F-2D4G6B8C0E3F" />
+            </desktop5:ItemType>
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+</Package>

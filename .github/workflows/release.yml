@@ -1,0 +1,46 @@
+name: Release Plugin Pack
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ZipEase.Core/plugin-**'
+      - 'build-plugin-pack.ps1'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build plugin pack
+        shell: powershell
+        run: |
+          ./build-plugin-pack.ps1
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install semantic-release
+        run: |
+          npm install -g semantic-release
+          npm install -g @semantic-release/commit-analyzer
+          npm install -g @semantic-release/release-notes-generator
+          npm install -g @semantic-release/changelog
+          npm install -g @semantic-release/github
+          npm install -g @semantic-release/git
+      
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: semantic-release

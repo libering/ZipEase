@@ -15,6 +15,20 @@ namespace ZipEase.UI.Core
         private readonly CompressionService _service = new();
         private CancellationTokenSource? _cts;
 
+        public CompressViewModel()
+        {
+            SelectedFiles.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsFileListEmpty));
+        }
+
+        [ObservableProperty] private bool _isOptionsVisible;
+
+        [RelayCommand]
+        private void ShowOptions()
+        {
+            if (SelectedFiles.Count == 0) return;
+            IsOptionsVisible = true;
+        }
+
         [ObservableProperty] private CompressState _state = CompressState.Idle;
         [ObservableProperty] private string _outputPath = string.Empty;
         [ObservableProperty] private string _selectedFormat = "zip";
@@ -24,24 +38,62 @@ namespace ZipEase.UI.Core
         [ObservableProperty] private string _statusMessage = string.Empty;
         [ObservableProperty] private bool _isStatusVisible;
         [ObservableProperty] private bool _isStatusError;
+        [ObservableProperty] private string _password = string.Empty;
+        [ObservableProperty] private bool _usePassword;
+
+        partial void OnUsePasswordChanged(bool value)
+        {
+            if (!value) Password = string.Empty;
+        }
 
         public ObservableCollection<string> SelectedFiles { get; } = new();
 
         // Computed
+        public bool IsFileListEmpty => SelectedFiles.Count == 0;
         public bool IsCompressing => State == CompressState.Compressing;
-        public bool CanCompress => State == CompressState.FilesSelected && !string.IsNullOrEmpty(OutputPath);
+        public bool CanCompress => (State == CompressState.FilesSelected || State == CompressState.Done) && !string.IsNullOrEmpty(OutputPath);
         public bool IsProgressVisible => State == CompressState.Compressing;
+        public bool IsPasswordSupported => SelectedFormat == "zip";
+        public Wpf.Ui.Controls.InfoBarSeverity StatusSeverity =>
+            IsStatusError ? Wpf.Ui.Controls.InfoBarSeverity.Error : Wpf.Ui.Controls.InfoBarSeverity.Success;
+
+        partial void OnSelectedFormatChanged(string value)
+        {
+            OnPropertyChanged(nameof(IsPasswordSupported));
+            // Clear password state when switching away from zip
+            if (value != "zip") { UsePassword = false; Password = string.Empty; }
+        }
 
         partial void OnStateChanged(CompressState value)
         {
             OnPropertyChanged(nameof(IsCompressing));
             OnPropertyChanged(nameof(CanCompress));
             OnPropertyChanged(nameof(IsProgressVisible));
+            OnPropertyChanged(nameof(StatusSeverity));
             CompressCommand.NotifyCanExecuteChanged();
         }
 
         partial void OnOutputPathChanged(string value)
         {
+            OnPropertyChanged(nameof(CanCompress));
+            CompressCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnIsStatusErrorChanged(bool value)
+        {
+            OnPropertyChanged(nameof(StatusSeverity));
+        }
+
+        [RelayCommand]
+        private void AddDroppedFiles(string[] files)
+        {
+            foreach (var file in files)
+                if (System.IO.File.Exists(file) && !SelectedFiles.Contains(file))
+                    SelectedFiles.Add(file);
+
+            if (SelectedFiles.Count > 0 && State == CompressState.Idle)
+                State = CompressState.FilesSelected;
+
             OnPropertyChanged(nameof(CanCompress));
             CompressCommand.NotifyCanExecuteChanged();
         }
@@ -60,6 +112,27 @@ namespace ZipEase.UI.Core
             foreach (var file in dialog.FileNames)
                 if (!SelectedFiles.Contains(file))
                     SelectedFiles.Add(file);
+
+            if (SelectedFiles.Count > 0 && State == CompressState.Idle)
+                State = CompressState.FilesSelected;
+
+            OnPropertyChanged(nameof(CanCompress));
+            CompressCommand.NotifyCanExecuteChanged();
+        }
+
+        [RelayCommand]
+        private void AddFolder()
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog
+            {
+                Description = "選擇要壓縮的資料夾",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = false
+            };
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            if (!string.IsNullOrEmpty(dialog.SelectedPath) && !SelectedFiles.Contains(dialog.SelectedPath))
+                SelectedFiles.Add(dialog.SelectedPath);
 
             if (SelectedFiles.Count > 0 && State == CompressState.Idle)
                 State = CompressState.FilesSelected;
@@ -123,10 +196,11 @@ namespace ZipEase.UI.Core
                     OutputPath,
                     Level,
                     progress,
-                    _cts.Token);
+                    _cts.Token,
+                    UsePassword && !string.IsNullOrEmpty(Password) ? Password : null);
 
                 State = CompressState.Done;
-                StatusMessage = $"壓縮完成：{Path.GetFileName(OutputPath)}";
+                StatusMessage = LocalizationManager.F("Status_CompressSuccess", Path.GetFileName(OutputPath));
                 IsStatusError = false;
                 IsStatusVisible = true;
             }
@@ -138,14 +212,14 @@ namespace ZipEase.UI.Core
             catch (CompressionException ex)
             {
                 State = CompressState.Error;
-                StatusMessage = $"壓縮失敗：{ex.Message}";
+                StatusMessage = LocalizationManager.F("Status_CompressFailed", ex.Message);
                 IsStatusError = true;
                 IsStatusVisible = true;
             }
             catch (Exception ex)
             {
                 State = CompressState.Error;
-                StatusMessage = $"未預期的錯誤：{ex.Message}";
+                StatusMessage = LocalizationManager.F("Status_UnexpectedError", ex.Message);
                 IsStatusError = true;
                 IsStatusVisible = true;
             }
@@ -165,6 +239,7 @@ namespace ZipEase.UI.Core
             CompressProgress = 0;
             CurrentFile = string.Empty;
             IsStatusVisible = false;
+            IsOptionsVisible = false;
             State = CompressState.Idle;
         }
     }

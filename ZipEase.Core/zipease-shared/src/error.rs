@@ -13,6 +13,7 @@ pub enum LockError {
     UnsupportedFormat(String),
     PluginRequired(String),
     PasswordRequired(String),
+    ZipBomb(String),
     Unknown(String),
 }
 
@@ -28,22 +29,24 @@ impl LockError {
             LockError::UnsupportedFormat(_) => 0x2002,
             LockError::PluginRequired(_) => 0x2003,
             LockError::PasswordRequired(_) => 0x2004,
+            LockError::ZipBomb(_) => 0x2005,
             LockError::Unknown(_) => -1,
         }
     }
 
     pub fn message(&self) -> String {
         match self {
-            LockError::PathNotFound(path) => format!("Path not found: {}", path),
-            LockError::InvalidPath(path) => format!("Invalid path: {}", path),
-            LockError::SharingViolation(path) => format!("Directory is already locked by another process: {}", path),
-            LockError::AccessDenied(path) => format!("Access denied: insufficient permissions to lock {}", path),
+            LockError::PathNotFound(path) => format!("Path not found: {path}"),
+            LockError::InvalidPath(path) => format!("Invalid path: {path}"),
+            LockError::SharingViolation(path) => format!("Directory is already locked by another process: {path}"),
+            LockError::AccessDenied(path) => format!("Access denied: insufficient permissions to lock {path}"),
             LockError::InvalidHandle => "Invalid handle: the handle is invalid or has been released".to_string(),
-            LockError::ExtractionFailed(msg) => format!("Extraction failed: {}", msg),
-            LockError::UnsupportedFormat(fmt) => format!("Unsupported archive format: {}", fmt),
-            LockError::PluginRequired(plugin) => format!("Plugin required: {}. This format requires an optional plugin to be installed.", plugin),
-            LockError::PasswordRequired(msg) => format!("Password required: {}", msg),
-            LockError::Unknown(msg) => format!("Unknown error: {}", msg),
+            LockError::ExtractionFailed(msg) => format!("Extraction failed: {msg}"),
+            LockError::UnsupportedFormat(fmt) => format!("Unsupported archive format: {fmt}"),
+            LockError::PluginRequired(plugin) => format!("Plugin required: {plugin}. This format requires an optional plugin to be installed."),
+            LockError::PasswordRequired(msg) => format!("Password required: {msg}"),
+            LockError::ZipBomb(msg) => msg.clone(),
+            LockError::Unknown(msg) => format!("Unknown error: {msg}"),
         }
     }
 }

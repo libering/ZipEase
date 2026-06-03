@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="ZipEase.UI/ZipEase.UI.csproj" />
   <Project Path="ZipEase.UI.Tests/ZipEase.UI.Tests.csproj" />
+  <Project Path="ZipEase.ShellExtension/ZipEase.ShellExtension.csproj" />
+  <Project Path="ZipEase.ShellExtension.Tests/ZipEase.ShellExtension.Tests.csproj" />
 </Solution>

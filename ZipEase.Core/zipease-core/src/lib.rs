@@ -1,3 +1,7 @@
+// FFI functions receive raw pointers from C# P/Invoke and must dereference them,
+// but cannot be marked `unsafe` as that changes the extern "C" calling convention.
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
+
 pub mod platform;
 pub mod lock;
 pub mod ffi;
@@ -6,11 +10,22 @@ pub mod ffi;
 pub use ffi::lock::{zip_ease_lock_directory, zip_ease_unlock_directory};
 pub use ffi::error::{zip_ease_get_last_error, zip_ease_free_error_string};
 
+/// Automatically initialise the Rust file logger when the DLL is loaded.
+/// `#[ctor]` runs before any user code — no manual call needed from C#.
+/// In release builds the log level can be raised to Warn/Error to reduce noise.
+#[ctor::ctor]
+fn dll_init() {
+    zipease_extract::init_logging();
+}
+
 // Lock-detector FFI — forwarding wrapper so the symbol is emitted in this cdylib.
 // (pub use alone does not force #[no_mangle] symbols from rlib deps into a cdylib.)
 #[no_mangle]
 pub extern "C" fn zip_ease_who_locks(path_ptr: *const u16) -> *mut u16 {
-    zipease_extract::ffi::lock_detector::zip_ease_who_locks(path_ptr)
+    std::panic::catch_unwind(|| {
+        zipease_extract::ffi::lock_detector::zip_ease_who_locks(path_ptr)
+    })
+    .unwrap_or(std::ptr::null_mut())
 }
 
 // Re-export extract FFI (from zipease-extract)
@@ -24,12 +39,11 @@ pub use zipease_extract::ffi::list::{
     zip_ease_list_archive_contents_with_password,
     zip_ease_free_archive_entries,
 };
+pub use zipease_extract::ffi::search::{
+    zip_ease_search_entries,
+    zip_ease_free_search_results,
+};
 
 // Re-export compress FFI (from zipease-compress)
 pub use zipease_compress::ffi::compress::zip_ease_compress;
 
-// Legacy smoke-test stub
-#[no_mangle]
-pub extern "C" fn zip_ease_add(left: u64, right: u64) -> u64 {
-    left + right
-}

@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
+// Retained: Send wrapper required for storing WindowsDirectoryLock in Arc<Mutex<HashMap>>
 #[allow(dead_code)]
 struct SendableLock(WindowsDirectoryLock);
 unsafe impl Send for SendableLock {}

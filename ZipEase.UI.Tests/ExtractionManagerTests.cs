@@ -99,4 +99,19 @@ public class ExtractionManagerTests
                     .Label($"callback must fire for valid percentage={validPct}");
             });
     }
+
+    [Fact]
+    public async Task PluginBackend_NonExistentScript_ThrowsPluginException()
+    {
+        var manifest = new ZipEase.UI.Core.Plugin.PluginManifest
+        {
+            Name = "Mock Python Plugin",
+            Executable = "non_existent_script.py"
+        };
+        var loaded = new ZipEase.UI.Core.Plugin.LoadedPlugin(manifest, "C:\\non_existent_script.py");
+
+        await Assert.ThrowsAsync<ZipEase.UI.Core.Plugin.PluginException>(() =>
+            ZipEase.UI.Core.Plugin.PluginBackend.ListAsync(loaded, "dummy_archive.zip"));
+    }
 }
+

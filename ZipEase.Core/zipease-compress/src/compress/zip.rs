@@ -1,5 +1,5 @@
 use std::fs::{self, File};
-use std::io::{self, Read};
+use std::io;
 use std::path::Path;
 use zip::write::{FileOptions, ZipWriter};
 use zip::CompressionMethod;
@@ -76,22 +76,43 @@ impl CompressionBackend for ZipBackend {
                 0 => CompressionMethod::Stored,
                 _ => CompressionMethod::Deflated,
             };
-            let file_options: FileOptions<()> = FileOptions::default()
-                .compression_method(compression)
-                .compression_level(Some(options.level as i64));
 
-            let mut buf = Vec::new();
             for (i, (disk_path, archive_name)) in all_files.iter().enumerate() {
                 progress_fn(i + 1, total, archive_name);
-                zip.start_file(archive_name, file_options)
-                    .map_err(|e| LockError::ExtractionFailed(e.to_string()))?;
-                buf.clear();
-                File::open(disk_path)
+
+                // Check file size to enable ZIP64 for files >= 4 GB
+                let file_size = fs::metadata(disk_path)
                     .map_err(|e| LockError::PathNotFound(e.to_string()))?
-                    .read_to_end(&mut buf)
-                    .map_err(|e| LockError::ExtractionFailed(e.to_string()))?;
-                use std::io::Write;
-                zip.write_all(&buf)
+                    .len();
+                let needs_zip64 = file_size >= 4_294_967_296;
+
+                if let Some(ref pwd) = options.password {
+                    // AES-256 encrypted entry
+                    let mut file_options = FileOptions::<zip::write::ExtendedFileOptions>::default()
+                        .compression_method(compression)
+                        .compression_level(Some(options.level as i64))
+                        .with_aes_encryption(zip::AesMode::Aes256, pwd);
+                    if needs_zip64 {
+                        file_options = file_options.large_file(true);
+                    }
+                    zip.start_file(archive_name, file_options)
+                        .map_err(|e| LockError::ExtractionFailed(e.to_string()))?;
+                } else {
+                    let mut file_options: FileOptions<()> = FileOptions::default()
+                        .compression_method(compression)
+                        .compression_level(Some(options.level as i64));
+                    if needs_zip64 {
+                        file_options = file_options.large_file(true);
+                    }
+                    zip.start_file(archive_name, file_options)
+                        .map_err(|e| LockError::ExtractionFailed(e.to_string()))?;
+                }
+
+                // Stream file data directly into the archive without loading
+                // the entire file into memory — fixes OOM for large files.
+                let mut file = File::open(disk_path)
+                    .map_err(|e| LockError::PathNotFound(e.to_string()))?;
+                io::copy(&mut file, &mut zip)
                     .map_err(|e| LockError::ExtractionFailed(e.to_string()))?;
             }
 

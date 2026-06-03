@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>x64</PlatformTarget>
+    <PublishAot>true</PublishAot>
+    <EnableComHosting>true</EnableComHosting>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>ZipEase.ShellExtension</RootNamespace>
+    <AssemblyName>ZipEase.ShellExtension</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ZipEase.ShellExtension.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -18,7 +18,8 @@ namespace ZipEase.UI.Core
             string outputPath,
             int level,
             IProgress<(int Pct, string File)>? progress,
-            CancellationToken ct = default)
+            CancellationToken ct = default,
+            string? password = null)
         {
             if (inputPaths == null || inputPaths.Count == 0)
                 throw new ArgumentException("At least one input path is required.", nameof(inputPaths));
@@ -51,13 +52,13 @@ namespace ZipEase.UI.Core
                     inputPtrs[i] = Marshal.StringToHGlobalUni(inputPaths[i]);
 
                 int result = await Task.Run(() =>
-                    NativeMethods.Compress(inputPtrs, inputPtrs.Length, outputPath, level, callback), ct);
+                    NativeMethods.Compress(inputPtrs, inputPtrs.Length, outputPath, level, password, callback), ct);
 
                 if (result != 0)
                 {
                     IntPtr errPtr = NativeMethods.GetLastError();
                     string message = errPtr != IntPtr.Zero
-                        ? Marshal.PtrToStringUni(errPtr) ?? "Unknown compression error"
+                        ? Marshal.PtrToStringUTF8(errPtr) ?? "Unknown compression error"
                         : "Unknown compression error";
                     if (errPtr != IntPtr.Zero) NativeMethods.FreeErrorString(errPtr);
                     throw new CompressionException(message, result);

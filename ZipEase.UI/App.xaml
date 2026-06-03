@@ -12,6 +12,11 @@
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
             <core:InverseBoolConverter x:Key="InverseBool"/>
+            <core:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+            <!-- Light-mode card background override: provides visual separation from window background.
+                 This brush is managed by App.xaml.cs — added for Light theme, removed for Dark theme. -->
+            <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#F5F5F5" />
+            <!-- Global localisation source — bind with {Binding Source={x:Static core:L.Current}, Path=Nav_Extract} -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

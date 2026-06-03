@@ -5,6 +5,7 @@ namespace ZipEase.UI.Core
         Idle,
         DragOver,
         Previewing,
-        Extracting
+        Extracting,
+        BatchExtracting
     }
 }

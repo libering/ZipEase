@@ -1,6 +1,6 @@
 # 📘 ZipEase Project Handover Book
 
-> **Last Updated**: 2026-05-25
+> **Last Updated**: 2026-06-01
 > **Status**: Feature Complete / **PHASE: Polish & Stabilization**
 
 ## 1. 項目概覽 (Project Overview)
@@ -48,6 +48,7 @@
 - [x] **ZIP64 支援** — 檔案 ≥ 4 GB 自動啟用 `large_file(true)`
 - [x] **多國語言 (i18n)** — `LocalizationManager`；繁中/英文
 - [x] **7z 檔案大小修復** — `sevenz.rs` 讀取 `e.size`；`sevenzadll/backend.rs` 查詢 `KPID_SIZE`；目錄保持 `-1`
+### 2.2 UI (C# WPF) — 🟢 完工
 - [x] WPF-UI 4.0.0 (lepoco/wpf-ui) 整合
 - [x] `App.xaml` — Mica 主題、Dark mode、WPF-UI 資源字典
 - [x] `MainWindow.xaml` — `ui:FluentWindow`，Mica backdrop，拖放區域，DataGrid 預覽，進度條，InfoBar
@@ -68,6 +69,7 @@
 - [x] **File Lock Detector** — `WhoLocksAsync` wrapper in `ExtractionManager.cs`; access-denied detection in `ExtractionException` catch block; replaces generic error with "X is using this file. Close it and try again."; `FreeString` in `finally` block
 - [x] **側邊欄導航** — 頂部 Tab 改為左側 160px 側邊欄，解壓縮 / 壓縮 / 設定三個項目，選中項 accent 高亮
 - [x] **設定頁面** (`AppSettings` + `SettingsView` + `SettingsViewModel`) — 持久化到 `%AppData%\ZipEase\settings.json`；設定項：強制提取、解壓後自動清理、檔案佔用偵測、任務完成通知、介面主題（跟隨系統/淺色/深色）
+- [x] **設定頁插件清單與管理** — 設定頁「已安裝插件」美化為卡片清單；新增「開啟插件資料夾」與「重新整理」按鈕；支援在免重啟下動態掃描與載入插件；無插件時顯示精美提示。
 - [x] **設定接線** — `Extract()` 讀取 `LastOutputDir` 記憶上次路徑；`ToastNotifications` / `AutoTrashAfterExtract` / `LockDetection` / `ForceExtract` 全部從 `AppSettings.Instance` 讀取
 - [x] **解壓縮選取項目** — `ExtractSelectedCommand` 接受 `DataGrid.SelectedItems`，code-behind `OnExtractSelectedClick` 傳入；toolbar 加「解壓縮選取」按鈕
 - [x] **搜尋/過濾** — `SearchText` 屬性即時過濾 DataGrid，toolbar 下方搜尋框，`ClearButtonEnabled`
@@ -102,23 +104,28 @@
 - `dynamic-theming` — ✅ 完成（自訂 XAML 主題 hot-reload、Mica/Acrylic 材質切換、SVG 圖示包替換）
 - `ui-and-listing-polish` — ✅ 完成（7z 檔案大小修復 + 淺色模式對比度修復）
 - `context-menu` — ✅ 完成（Windows 右鍵選單整合：Shell Extension NativeAOT DLL、Sparse MSIX + Registry fallback、設定頁管理）
+- `image-preview-plugin` — ✅ 完成（壓縮包內圖片預覽：縮放、平移、導航、縮圖、LRU 快取、PBT 測試）
+- `archive-repair` — ✅ 已完成（損壞修復演算法：ZIP/RAR header 重建、Central Directory 重建、CRC 重算）
+- `archive-search` — ✅ 已完成（壓縮檔內搜尋：Glob/子字串搜尋、FFI 介面、C# 搜尋框整合）
+- `batch-extraction` — ✅ 已完成（批次解壓：多檔案拖放、解壓佇列、FFI 介面、C# 批次解壓管理）
+- `codebase-cleanup` — ✅ 已完成（代碼清理：刪除冗餘模組、依賴優化、單元與屬性測試整理、FFI 異常安全 wrap）
 
 ## 3. 已修復的 Bug
 
 ### Bug 1: RAR 無法打開
-- **根本原因**: `unrar` crate 需要 WinRAR 原生 `unrar.dll`，不適合獨立分發
-- **解決方案**: 實作 `SevenZaDllBackend`，透過 `libloading` 動態載入 `7za.dll`，使用 COM-like `IInArchive` 介面
-- **相關檔案**: `ZipEase.Core/src/extract/sevenzadll.rs`
+- **根本原因**: 早期嘗試使用 `SevenZaDllBackend` 透過 `7za.dll` 解壓 RAR，但 standalone `7za.dll` 不支援 RAR 解壓所需的 CLSID，導致開啟 RAR 失敗。
+- **解決方案**: 改用 `unrar` crate（靜態連結 unrar C++ 源碼，不需要外部 DLL）。為解決 Windows 路徑穿越與斜線相容問題，`RarBackend` 採用 `read()` 模式讀取位元組手動寫檔，繞過 `extract_to` 的限制。
+- **相關檔案**: [rar.rs](file:///d:/vibe%20coding/zipease/ZipEase.Core/zipease-extract/src/extract/rar.rs)
 
 ### Bug 2: 7z 列表顯示目錄條目 + 進度計數錯誤
 - **根本原因**: `sevenz.rs` 的 `list_entries` 未過濾目錄，`extract_with_progress` 的 `total` 包含目錄數
 - **解決方案**: 加 `.filter(|e| !e.is_directory())`；`total` 改用過濾後的 `.count()`
-- **相關檔案**: `ZipEase.Core/src/extract/sevenz.rs`
+- **相關檔案**: [sevenz.rs](file:///d:/vibe%20coding/zipease/ZipEase.Core/zipease-extract/src/extract/sevenz.rs)
 
 ### Bug 3: TAR 列表顯示目錄條目 + `./` 前綴
 - **根本原因**: `tar.rs` 的 `list_entries` 未過濾目錄，路徑帶有 `./` 前綴
 - **解決方案**: 加 `entry_type().is_dir()` 過濾；`trim_start_matches("./")` 去除前綴
-- **相關檔案**: `ZipEase.Core/src/extract/tar.rs`
+- **相關檔案**: [tar.rs](file:///d:/vibe%20coding/zipease/ZipEase.Core/zipease-extract/src/extract/tar.rs)
 
 ### Bug 4: 7z 檔案大小顯示為 "—"（已修正）
 - **根本原因**: `sevenz.rs` 和 `sevenzadll/backend.rs` 的 `list_entries_info` 硬編碼 `size: -1`，未讀取實際解壓大小
@@ -129,13 +136,21 @@
 - **相關檔案**: `ZipEase.Core/zipease-extract/src/extract/sevenz.rs`, `ZipEase.Core/zipease-extract/src/extract/sevenzadll/backend.rs`, `ZipEase.Core/zipease-extract/src/extract/sevenzadll/types.rs`
 - **PBT 驗證**: bug condition test + preservation test（ZIP 大小不變、目錄旗標不變、檔名不變）
 
+### Bug 5: 設定頁插件清單未正確顯示或顯示空白
+- **根本原因**: `SettingsView.xaml` 將 `ItemsControl` 直接作為 `ui:CardControl` 的 Content 屬性，且缺乏「無插件」提示及開啟資料夾/重新整理按鈕；此外，若 `%AppData%\ZipEase\plugins\` 中缺少對應插件的執行檔，`PluginRegistry` 會將其過濾導致清單為空，造成使用者無法查看與重新整理。
+- **解決方案**: 
+  1. 將 `PluginRegistry.PluginsDir` 公開。
+  2. 在 `LoadedPlugin` 新增 `DisplayExtensions` 與 `DisplayCapabilities` 屬性。
+  3. 在 `SettingsViewModel` 實作 `OpenPluginsFolderCommand` 與 `ReloadPluginsCommand`，並提供 `HasPlugins`/`HasNoPlugins` 狀態。
+  4. 重構 `SettingsView.xaml`，將插件管理拆分為獨立卡片，支援「開啟資料夾」與「重新整理」；下方使用 ItemsControl 動態載入精美卡片式插件清單，並在無插件時顯示 Info 圖示與引導文字。
+- **相關檔案**: [PluginRegistry.cs](file:///d:/vibe%20coding/zipease/ZipEase.UI/Core/Plugin/PluginRegistry.cs), [SettingsViewModel.cs](file:///d:/vibe%20coding/zipease/ZipEase.UI/Core/SettingsViewModel.cs), [SettingsView.xaml](file:///d:/vibe%20coding/zipease/ZipEase.UI/Core/SettingsView.xaml)
+
 ## 4. 待辦事項 (Next Steps)
 
 ### 立即執行
 1. **GitHub Push** — 所有功能已完成，可以提交
 
 ### 後續功能 (可選)
-- 損壞修復演算法 (ZIP/RAR header repair) — 目前僅支援 CRC 忽略，不做 header 重建
 - 自動更新 — GitHub Releases API + Squirrel.Windows
 - 解壓縮歷史記錄 — 記住最近 20 個壓縮檔路徑，設定頁可清除
 - 批次解壓縮 — 一次拖入多個壓縮檔，全部解壓到同一目錄
@@ -165,14 +180,57 @@
 - [x] Requirements 文档完成（8 个需求）
 - [x] Design 文档完成（架构图、组件设计、安全考量、semantic-release 配置）
 - [x] Tasks 文档完成（6 阶段、24 任务、预估 34-48 小时）
-- [ ] 实现待开始
+- [x] Phase 1–6 完整實作（包含 7za.dll COM 插件、LZ4/Zstd 原生 Rust 插件、ACE/ARJ/LHA/DMG Python 適配器、C# 整合與 Fallback 機制、PowerShell 打包腳本、semantic-release 與 GitHub Actions 設定）
+
 
 **关键文件**：
 - `.kiro/specs/official-plugin-pack/requirements.md`
 - `.kiro/specs/official-plugin-pack/design.md`
 - `.kiro/specs/official-plugin-pack/tasks.md`
 
-### 🔴 待解決問題
+### 压缩包图片预览插件 — ✅ 已完成
+
+**Spec 位置**: `.kiro/specs/image-preview-plugin/`
+
+**功能**：在压缩包内直接预览图片，支持缩放、平移、导航
+
+**实现**：
+- **Rust 后端** (`zipease-preview` crate)：
+  - 图片解码：PNG、JPEG、GIF、BMP、WebP、TIFF、ICO
+  - Magic bytes 验证（防止伪造副档名）
+  - LRU 快取（256 MB 容量）
+  - 缩图生成（64×64，maintaining aspect ratio）
+  - 自然排序导航
+  - 安全限制：100 MB 档案大小、16384×16384 解析度、10 秒解码逾时、512 MB 记忆体上限
+- **C# 前端**：
+  - `PreviewPanel.xaml` + `PreviewViewModel.cs`
+  - `ZoomPanService.cs`（缩放/平移逻辑）
+  - `NavigationService.cs`（目录范围导航）
+  - `ThumbnailService.cs`（缩图显示整合）
+  - 键盘支援：←/→ 导航、Esc 关闭
+
+**PBT 测试**：
+- `magic_bytes_pbt.rs` — 魔术字节验证正确性
+- `rgba_buffer_pbt.rs` — RGBA 缓冲区大小正确性
+- `thumbnail_pbt.rs` — 缩图长宽比保持
+- `navigation_filter_pbt.rs` — 目录范围导航过滤
+- `safe_join_pbt.rs` — 路径穿越拒绝
+
+**状态**：
+- [x] Requirements 文档完成（11 个需求）
+- [x] Design 文档完成
+- [x] Tasks 文档完成（17 阶段、全部完成）
+- [x] Rust 后端实现完成
+- [x] C# 前端实现完成
+- [x] PBT 测试通过
+
+**关键文件**：
+- `ZipEase.Core/zipease-preview/` (Rust crate)
+- `ZipEase.UI/Core/ThumbnailService.cs`
+- `ZipEase.UI/Core/PreviewViewModel.cs`
+- `ZipEase.UI/Core/ZoomPanService.cs`
+
+### 🟢 已解決問題 / Bug 修復確認
 
 #### 1. Rust log 輸出（✅ 已確認）
 - **結果**：`%TEMP%\ZipEase_rust_*.log` 正常寫入，包含 logger 初始化、列表操作、預覽提取等記錄
@@ -200,6 +258,24 @@
 - DropZone 空白狀態插圖 — 換成自訂 SVG/PNG（目前用 WPF-UI `SymbolIcon`）
 - DataGrid 檔案類型圖示 — 每行左側加小圖示（目前用 `SymbolIcon`，可換成自訂 PNG）
 - 整合方式：PNG 放 `ZipEase.UI/Assets/`，XAML 用 `<Image Source="/Assets/xxx.png"/>`
+
+#### 圖示資源推薦（符合開源授權）
+
+| 圖示包 | 授權 | 數量 | 格式 | 來源 |
+|--------|------|------|------|------|
+| **Fluent System Icons** ⭐ 首選 | MIT License | 4,000+ | SVG, PNG | [github.com/microsoft/fluentui-system-icons](https://github.com/microsoft/fluentui-system-icons) |
+| **Segoe Fluent Icons Font** | Microsoft 軟體授權條款 | Windows 內建 | 字型 | Windows 系統內建（Windows 11+） |
+| **Material Design Icons** | Apache 2.0 / Pictogrammers Free License | 7,000+ | SVG, PNG | [pictogrammers.com/library/mdi](https://pictogrammers.com/library/mdi/) |
+| **MahApps.Metro.IconPacks** | MIT License | 多種圖示包 | WPF 原生 | [github.com/MahApps/MahApps.Metro.IconPacks](https://github.com/MahApps/MahApps.Metro.IconPacks) |
+
+**使用建議**：
+1. **Fluent System Icons** — 與 WPF-UI 4.x 的 Fluent 設計語言完全匹配，下載 SVG 檔案
+2. **Segoe Fluent Icons** — Windows 內建字型，XAML 直接引用，零相依性
+3. **MahApps.Metro.IconPacks** — NuGet 套件 (`Install-Package MahApps.Metro.IconPacks`)，WPF 原生支援
+
+**相關圖示關鍵字**：
+- `archive`, `folder`, `document`, `arrow-download` (Fluent)
+- `archive`, `folder-zip`, `file-compress`, `folder-arrow-down` (Material)
 
 ### 插件系統 (Format Plugin System) — ✅ 已完成
 - 插件為任意可執行檔，放在 `%AppData%\ZipEase\plugins\{name}\`，附帶 `plugin.json`
@@ -231,10 +307,109 @@
 
 ### 其他自定義功能接口 — 規劃中
 - **自動更新** — GitHub Releases API 版本檢查 + `Squirrel.Windows`，背景靜默更新
-- **解壓縮歷史記錄** — 記住最近 20 個壓縮檔路徑，設定頁可清除
-- **批次解壓縮** — 一次拖入多個壓縮檔，全部解壓到同一目錄（需要 UI 狀態機擴展）
+- **批次解壓縮** — ✅ 已完成（`BatchExtractionManager` + Rust `batch_extract`）
+- **解壓縮歷史記錄** — 📝 Spec 已完成
+
+**Spec 位置**: `.kiro/specs/extraction-history/`
+
+**目標**：記住最近 20 個壓縮檔路徑，設定頁顯示歷史記錄
+
+**功能**：
+- 自動記錄成功解壓縮的壓縮檔路徑
+- 設定頁顯示歷史記錄列表（檔名 + 相對時間）
+- 點擊項目直接開啟壓縮檔
+- 檔案不存在時灰色標示
+- 一鍵清除（需確認對話框）
+
+**實現方式**：純 C# 端，整合到 `AppSettings`
+
+**狀態**：
+- [x] Requirements 文档完成（6 个需求）
+- [x] Design 文档完成（資料模型、ViewModel、UI 設計）
+- [x] Tasks 文档完成（8 階段、16 任務、預估 5 小時）
+- [ ] 實现待开始
+
+**關鍵文件**：
+- `.kiro/specs/extraction-history/requirements.md`
+- `.kiro/specs/extraction-history/design.md`
+- `.kiro/specs/extraction-history/tasks.md`
+
+### 損壞修復演算法 (Archive Repair) — ✅ 已完成
+
+**Spec 位置**: `.kiro/specs/archive-repair/`
+
+**功能**：診斷並修復損壞的 ZIP/RAR 壓縮包
+
+**實現**：
+- **Rust 後端** (`zipease-extract/src/repair/`)：
+  - `ZipScanner`：掃描 Local File Header 簽名、解析 EOCD、診斷 Central Directory 損壞
+  - `ZipRepairer`：重建 Central Directory、重算 CRC-32、寫入修復後檔案
+  - `RarScanner`：檢測 RAR4/RAR5 標記、驗證 Header CRC
+  - `RarRepairer`：修復標記塊、重建 Archive Header
+  - `RepairEngine`：格式檢測與路由入口
+- **FFI 接口**：
+  - `zip_ease_diagnose_archive`：診斷損壞類型，返回 JSON 結果
+  - `zip_ease_repair_archive`：執行修復，支持進度回調
+  - `zip_ease_free_diagnosis`：釋放記憶體
+- **C# 前端**：
+  - `RepairService.cs`：P/Invoke 包裝、JSON 反序列化
+  - `MainWindowViewModel` 整合：修復流程狀態機
+  - UI：InfoBar「文件損壞，點擊修復」→ 進度 → 結果顯示
+
+**修復類型**：
+- ZIP Central Directory 缺失/損壞 → 從 Local File Headers 重建
+- ZIP CRC 錯誤 → 重算或使用 extract_force 繞過
+- RAR 標記塊損壞 → 重建正確標記
+- RAR Header CRC 錯誤 → 重新計算
+
+**PBT 測試**：
+- DamageReport 序列化 round-trip
+- LFH signature scanner 完整性
+- CD 重建保留 LFH metadata
+- CRC-32 重算正確性
+- 修復後 ZIP 可開啟
+- 非破壞性修復保證
+
+**狀態**：
+- [x] Requirements 文檔完成（12 個需求）
+- [x] Design 文檔完成
+- [x] Tasks 文檔完成（12 階段、全部完成）
+- [x] Rust 後端實現完成
+- [x] C# 前端實現完成
+- [x] PBT 測試通過
+
+**關鍵文件**：
+- `ZipEase.Core/zipease-extract/src/repair/mod.rs`
+- `ZipEase.Core/zipease-extract/src/repair/zip_scanner.rs`
+- `ZipEase.Core/zipease-extract/src/repair/zip_repairer.rs`
+- `ZipEase.Core/zipease-extract/src/repair/rar_scanner.rs`
+- `ZipEase.Core/zipease-extract/src/repair/rar_repairer.rs`
+- `ZipEase.UI/Core/RepairService.cs`
+
+### 壓縮格式擴展包 (規劃中) — 📝 Spec 已完成
+
+**Spec 位置**: `.kiro/specs/archive-format-extensions/`
+
+**目標**：擴展支援 BZIP2 單檔、XZ 單檔、LZ4、Zstandard 單檔等純壓縮格式，以及複合歸檔格式（.tar.lz4, .tar.zst），並建立統一的格式註冊與路由機制。
+
+**功能**：
+- 統一的格式註冊機制 (Format Registry)，以執行緒安全方式管理格式後端
+- 整合成熟的 Rust crate 支援單檔解壓與壓縮 (BZIP2, XZ, LZ4, Zstandard)
+- 支援 TAR 複合格式解壓與壓縮，且在解壓時以串流直接傳入解析器，保證記憶體安全
+- 壓縮與解壓 UI 整合，自動偵測單檔格式限制並提供一鍵切換複合格式按鈕
+- 提供完整的 Round-Trip 屬性測試驗證
+
+**狀態**：
+- [x] Requirements 文檔完成（12 個需求）
+- [ ] Design 文檔待開始
+- [ ] Tasks 文檔待開始
+- [ ] 實作待開始
+
+**關鍵文件**：
+- `.kiro/specs/archive-format-extensions/requirements.md`
 
 ## 5. 關鍵技術決策與踩坑記錄
+
 
 ### 架構邊界 (嚴格執行)
 - **零業務邏輯在 C#** — 所有邏輯在 Rust，C# 只做 UI 綁定
@@ -370,11 +545,19 @@
 - **例外安全**：所有 Shell Extension 程式碼路徑 try-catch → `E_FAIL` HRESULT，絕不 crash explorer.exe
 - **圖示降級**：`.ico` 不存在時回傳空字串，選單仍顯示但無圖示
 
+### 官方插件包與 Fallback 機制
+- **C# 雙向路由與回退機制**：解壓 (`ExtractAsync`) 與列表 (`ListArchiveContentsWithPassword`/`KeepNative`) 均支援插件。若主插件因「環境依賴缺失/啟動失敗」（例如 Windows 上未安裝 Python，或缺少 `7za.dll`）拋出 `PluginException`，C# 端會自動捕獲，並查詢 manifest 中的 `fallback_extensions` 欄位，調用對應的備用插件進行重試。
+- **Python CLI 適配器在 Windows 上的執行**：對於 ACE, ARJ, LHA 格式，Python 適配器（如 `plugin_ace.py`）透過 stdin 接收 JSON 請求，並調用 `tools/` 中的 Win32 工具。在執行解壓時，Python 腳本會先切換 `cwd` 至 C# 指定的輸出目錄，然後將壓縮包絕對路徑傳給 CLI 工具以確保解壓路徑的準確。C# `PluginBackend.cs` 也適配了對 `.py` 檔案的調用（若為 `.py` 結尾，則調用 `python` 作為 executable 並傳入腳本路徑作為 arguments）。
+- **單檔案壓縮格式處理**：對於 LZ4/Zstandard 等單檔案壓縮格式（`plugin-lz4`, `plugin-zstd`），在 UI 預覽時，由於格式限制優先將「壓縮檔名去掉副檔名」作為內部檔案名稱；解壓大小若無法從 header 中讀取，則回傳 `-1` 標記為「未知大小」。
+- **WPF 屬性測試修正**：修正了 `ZoomPanServiceTests.cs` 中原有 Property-based Test 的一個 size 構造 bug，將 invalid 寬高生成器限制為僅生成 `0.0`，以防止 WPF 的 `Size` 構造函數因負數直接拋出 `ArgumentException` 崩潰。
+- **UI 按鈕簡化與合併**：移除了預覽介面頂部的「損壞檔案強制提取」CheckBox（該選項已在設定頁有專屬 Toggle 控制，避免重複配置）；將「全部解壓縮」與「解壓縮選定」按鈕合併為單一的「解壓縮」按鈕，並於 Code-Behind 監聽 `SelectionChanged` 事件。無選取時顯示為「全部解壓縮」（圖示 `FolderArrowUp`），有選取項目時顯示為「解壓縮選定」（圖示 `ArrowDownload`），有效降低使用者的視覺與認知負荷。
+
 ## 6. 關鍵檔案索引
+
 
 | 檔案 | 用途 |
 |------|------|
-| `ZipEase.Core/zipease-extract/src/extract/sevenzadll.rs` | RAR 後端：7za.dll COM 介面 |
+| `ZipEase.Core/zipease-extract/src/extract/sevenzadll/backend.rs` | RAR 後端：7za.dll COM 介面 |
 | `ZipEase.Core/zipease-extract/src/extract/sevenz.rs` | 7z 後端：目錄過濾修復 |
 | `ZipEase.Core/zipease-extract/src/extract/tar.rs` | TAR 後端：目錄過濾，`./` 前綴去除 |
 | `ZipEase.Core/zipease-extract/src/extract/zip.rs` | ZIP 後端：`extract_force_progress`，`extract_entry` |
@@ -432,8 +615,17 @@
 | `ZipEase.UI/Core/ShellExtensionStatus.cs` | 註冊狀態枚舉 + 結果記錄 |
 | `packaging/AppxManifest.xml` | Sparse MSIX 清單：COM server + FileExplorerContextMenus 宣告 |
 | `packaging/build-sparse-msix.ps1` | MSIX 打包腳本 |
+| `ZipEase.Core/plugin-lz4/src/main.rs` | 原生 LZ4 解壓插件（含 lz4_flex 串流解壓與單元測試） |
+| `ZipEase.Core/plugin-zstd/src/main.rs` | 原生 Zstandard 解壓插件（含 zstd 串流解壓與單元測試） |
+| `ZipEase.Core/plugin-ace/plugin_ace.py` | ACE 格式的 Python CLI 適配器 |
+| `ZipEase.Core/plugin-arj/plugin_arj.py` | ARJ 格式的 Python CLI 適配器 |
+| `ZipEase.Core/plugin-lha/plugin_lha.py` | LHA/LZH 格式的 Python CLI 適配器 |
+| `ZipEase.Core/plugin-dmg/plugin_dmg.py` | DMG 格式的 Python CLI 適配器（優先調用 local/path 的 7z.exe） |
+| `build-plugin-pack.ps1` | 官方插件包 PowerShell 一鍵打包指令 |
+| `.releaserc.json` / `.github/workflows/release.yml` | 官方插件包 semantic-release 與 GitHub Actions CI/CD 設定 |
 
 ---
+
 *Generated by ZipEase Architect Team*
 
 ## 7. 編譯與啟動
